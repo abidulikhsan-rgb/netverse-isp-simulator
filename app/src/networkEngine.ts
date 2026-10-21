@@ -1,6 +1,6 @@
 export type DeviceKind = 'router' | 'switch' | 'olt' | 'ont' | 'pc' | 'server';
 export type DeviceConfig = { hostname: string; addresses: string[]; interfaces: Record<string, { enabled: boolean; address?: string; comment?: string }>; bridgePorts: string[]; dhcp: { enabled: boolean; poolStart: string; poolEnd: string; gateway: string }; dns: string[]; routes: string[] };
-export type Device = { id: string; kind: DeviceKind; name: string; x: number; y: number; config: DeviceConfig };
+export type Device = { id: string; kind: DeviceKind; name: string; x: number; y: number; config: DeviceConfig; poweredOff?: boolean };
 export type Link = { id: string; from: string; to: string; fromPort: string; toPort: string };
 export type LabState = { devices: Device[]; links: Link[] };
 export type DeviceStatus = 'up' | 'idle' | 'error';
@@ -24,6 +24,7 @@ export function removeAddress(device: Device, index: number): Device {
   return { ...device, config: { ...device.config, addresses: device.config.addresses.filter((_, i) => i !== index), interfaces: { ...device.config.interfaces, [iface]: { ...device.config.interfaces[iface], address: undefined } } } };
 }
 export function deviceStatus(device: Device, state: LabState): DeviceStatus {
+  if (device.poweredOff) return 'error';
   const own = device.config.addresses.map(a => a.split('@')[0]);
   const duplicate = own.some(a => state.devices.some(o => o.id !== device.id && o.config.addresses.some(oa => oa.split('@')[0] === a)));
   if (duplicate) return 'error';
@@ -66,3 +67,97 @@ export function runCommand(device: Device, command: string): { device: Device; o
   throw new Error('Perintah belum didukung oleh simulator. Ketik /help untuk melihat perintah yang tersedia.');
 }
 export function canConnect(state: LabState, from: string, to: string): boolean { return from !== to && state.devices.some(d => d.id === from) && state.devices.some(d => d.id === to) && !state.links.some(l => (l.from === from && l.to === to) || (l.from === to && l.to === from)); }
+
+/**
+ * Menentukan apakah sebuah kabel aktif di kedua ujungnya.
+ * Fungsi ini memeriksa koneksi fisik/logis sederhana,
+ * bukan routing IP sungguhan.
+ */
+export function isLinkOperational(link: Link, state: LabState): boolean {
+  const from = state.devices.find(d => d.id === link.from);
+  const to = state.devices.find(d => d.id === link.to);
+
+  if (!from || !to || from.poweredOff || to.poweredOff) return false;
+
+  const fromInterface = from.config.interfaces[link.fromPort];
+  const toInterface = to.config.interfaces[link.toPort];
+
+  return Boolean(fromInterface?.enabled && toInterface?.enabled);
+}
+
+/**
+ * Mengembalikan ID semua perangkat yang bisa dijangkau
+ * dari perangkat awal melalui kabel yang aktif.
+ */
+export function getReachableDevices(
+  state: LabState,
+  startId: string
+): string[] {
+  if (!state.devices.some(d => d.id === startId)) return [];
+
+  const visited = new Set<string>([startId]);
+  const queue = [startId];
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+
+    for (const link of state.links) {
+      if (!isLinkOperational(link, state)) continue;
+
+      let neighbor: string | null = null;
+
+      if (link.from === current) neighbor = link.to;
+      else if (link.to === current) neighbor = link.from;
+
+      if (
+        neighbor &&
+        !visited.has(neighbor) &&
+        state.devices.some(d => d.id === neighbor)
+      ) {
+        visited.add(neighbor);
+        queue.push(neighbor);
+      }
+    }
+  }
+
+  return [...visited];
+}
+
+export type NetworkAnalysis = {
+  components: string[][];
+  isolatedDeviceIds: string[];
+  inactiveLinkIds: string[];
+};
+
+/**
+ * Menganalisis kelompok koneksi yang masih aktif,
+ * perangkat tanpa koneksi aktif, dan kabel yang tidak aktif.
+ */
+export function analyzeNetwork(state: LabState): NetworkAnalysis {
+  const visited = new Set<string>();
+  const components: string[][] = [];
+
+  for (const device of state.devices) {
+    if (visited.has(device.id)) continue;
+
+    const component = getReachableDevices(state, device.id);
+    component.forEach(id => visited.add(id));
+    components.push(component);
+  }
+
+  const isolatedDeviceIds = state.devices
+    .filter(device =>
+      !state.links.some(
+        link =>
+          (link.from === device.id || link.to === device.id) &&
+          isLinkOperational(link, state)
+      )
+    )
+    .map(device => device.id);
+
+  const inactiveLinkIds = state.links
+    .filter(link => !isLinkOperational(link, state))
+    .map(link => link.id);
+
+  return { components, isolatedDeviceIds, inactiveLinkIds };
+}
