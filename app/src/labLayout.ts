@@ -12,6 +12,7 @@ export const AISLE_NAMES = ['A', 'B', 'C'] as const;
 export const AISLE_SIGN_X = [0, 4.05, -4.05] as const;
 export const AISLE_SIGN_Z = -12;
 export const NOC_RACK = 0; // first rack of Lorong A left row (x=-1.55, z=-7.5)
+export const NOC_HERO_Y = RACK_H - 0.92;
 
 export type Aisle = (typeof AISLE_NAMES)[number];
 export type RackCoord = { rx: number; rz: number; yaw: number; aisle: Aisle; row: 0 | 1 };
@@ -47,7 +48,7 @@ export function planLabLayout(devices: Device[]): { racks: RackCoord[]; usedY: n
   const put = (d: Device, start: number) => {
     const h = KIND_HEIGHT[d.kind] ?? 0.6;
     for (let r = start; r < racks.length; r++) {
-      const cap = r === NOC_RACK ? RACK_H - 0.62 : RACK_H - 1.05;
+      const cap = r === NOC_RACK ? NOC_HERO_Y - 0.01 : RACK_H - 1.05;
       if (usedY[r] + h <= cap) {
         const yBottom = usedY[r];
         usedY[r] += h + 0.01;

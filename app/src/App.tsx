@@ -298,6 +298,16 @@ export default function App() {
     setSshPanel(false);
     setShowRemoteOps(true);
   };
+  const openHeroTerminal = () => {
+    const router = lab.devices.find(device => device.kind === 'router' && !removedDevices.has(device.id));
+    if (!router) {
+      setNotice('CCR1072 tidak dapat membuka terminal — tambahkan Router ke lab terlebih dahulu');
+      return;
+    }
+    setTerminalDevice(router.id);
+    setShowTerminal(true);
+    setNotice(`Terminal CCR1072 terhubung ke ${router.name}`);
+  };
   const patchDevice = (id: string, patch: Partial<Device> | ((d: Device) => Device)) => setLab(s => ({ ...s, devices: s.devices.map(d => d.id !== id ? d : typeof patch === 'function' ? patch(d) : { ...d, ...patch }) }));
   useEffect(() => {
     const previousGrid = previousPowerGridRef.current;
@@ -496,7 +506,7 @@ export default function App() {
 
     <main className="workspace">
       <div className="canvas-area">
-        <Room3D devices={lab.devices} links={lab.links} selectedId={selected} linkStartId={linkStart} onDeviceClick={clickDevice} onEmptyClick={() => setSelected(null)} room={room} onRoomChange={setRoom} onScreenClick={(id) => setNocPanel(id)} nocData={nocData} powerGrid={powerGrid} carrying={carrying} onCarry={setCarrying} onMaintain={handleMaintenance} removedLinks={removedLinks} removedDevices={removedDevices} pcOn={pcOn} interactionLocked={showRemoteOps || sshPanel || nocPanel !== null || showConfig || confirm !== null || panelOpen} onPowerOn={powerOnNocPc} onPowerOff={powerOffNocPc} onRemoteOps={openRemoteOps} onOpenPowerPanel={() => setPanelOpen(true)} />
+        <Room3D devices={lab.devices} links={lab.links} selectedId={selected} linkStartId={linkStart} onDeviceClick={clickDevice} onEmptyClick={() => setSelected(null)} room={room} onRoomChange={setRoom} onScreenClick={(id) => setNocPanel(id)} nocData={nocData} powerGrid={powerGrid} carrying={carrying} onCarry={setCarrying} onMaintain={handleMaintenance} removedLinks={removedLinks} removedDevices={removedDevices} pcOn={pcOn} interactionLocked={showRemoteOps || sshPanel || nocPanel !== null || showConfig || confirm !== null || panelOpen} onPowerOn={powerOnNocPc} onPowerOff={powerOffNocPc} onRemoteOps={openRemoteOps} onHeroTerminal={openHeroTerminal} onOpenPowerPanel={() => setPanelOpen(true)} />
         {connectMode && <div className="mode-banner"><Cable size={14}/>{linkStart ? 'Choose the second device' : 'Cable mode — click the first device'}<button onClick={() => { setConnectMode(false); setLinkStart(null); }}>Cancel</button></div>}
       </div>
     </main>

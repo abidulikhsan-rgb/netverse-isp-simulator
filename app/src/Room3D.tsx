@@ -3,9 +3,10 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { Device, DeviceKind, DeviceStatus, Link } from './networkEngine';
 import { deviceStatus } from './networkEngine';
-import { allRacks, planLabLayout, RACK_H, RACK_W, RACK_D, NOC_RACK, AISLE_NAMES, AISLE_SIGN_X, AISLE_SIGN_Z, type Aisle, type DevicePlace } from './labLayout';
+import { allRacks, planLabLayout, RACK_H, RACK_W, RACK_D, NOC_RACK, NOC_HERO_Y, AISLE_NAMES, AISLE_SIGN_X, AISLE_SIGN_Z, type Aisle, type DevicePlace } from './labLayout';
 import { isAislePowered, simNetwork, type PowerGrid } from './labMetrics';
 import { drawScreen, type NocScreenId, type NocData } from './nocScreens';
+import { heroLcdData, heroLcdLines, nextHeroLcdView, type HeroLcdData, type HeroLcdView } from './heroLcd';
 import { audio } from './audio';
 import { loadNetverseAsset } from './three-loader';
 import { maintenanceActionLabel, rackKey, selectRackAction, selectStoragePickup, type Carrying, type MaintenanceAction } from './maintenance';
@@ -21,6 +22,17 @@ const KIND_SPEC: Record<DeviceKind, KindSpec> = {
   ont: { color: 0xf4f5f6, face: 0xffffff, bezel: 0xe2e5e9, height: 0.42, depth: 0.55, portStyle: 'sfp', leds: 4 },
   pc: { color: 0x9aa3ad, face: 0xa4adb6, bezel: 0x747d86, height: 0.42, depth: 0.55, portStyle: 'rj45', leds: 2 },
   server: { color: 0x262b33, face: 0x20252c, bezel: 0x101318, height: 1.2, depth: 0.8, portStyle: 'rj45', leds: 3, drives: 4 },
+};
+
+const HERO_KIND_SPEC: KindSpec = {
+  color: 0x252b31,
+  face: 0x303840,
+  bezel: 0x12171c,
+  height: 0.27,
+  depth: 0.7,
+  portStyle: 'sfp',
+  lcd: true,
+  leds: 2,
 };
 
 const PORT_DIMS: Record<PortStyle, [number, number]> = { rj45: [0.1, 0.14], sfp: [0.13, 0.17] };
@@ -143,6 +155,10 @@ function frontDir(yaw: number): THREE.Vector3 {
 function rightDir(yaw: number): THREE.Vector3 {
   return new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
 }
+
+const HERO_RACK = RACK_COORDS[NOC_RACK];
+const HERO_FRONT_POSITION = new THREE.Vector3(HERO_RACK.rx, NOC_HERO_Y, HERO_RACK.rz)
+  .addScaledVector(frontDir(HERO_RACK.yaw), RACK_D / 2 + 0.04);
 
 let placementWarningLogged = false;
 
@@ -386,6 +402,10 @@ function addFrontPanel(group: THREE.Group, spec: KindSpec, status: DeviceStatus)
 
 const STATUS_LABEL: Record<DeviceStatus, string> = { up: 'Online', idle: 'Idle', error: 'Error' };
 
+function maintenanceActionIdentity(action: MaintenanceAction): string {
+  return 'linkId' in action ? `${action.type}:${action.linkId}` : `${action.type}:${action.id}`;
+}
+
 function makeLabel(text: string, highlighted: boolean): THREE.Sprite {
   const canvas = document.createElement('canvas');
   canvas.width = 512; canvas.height = 128;
@@ -400,6 +420,186 @@ function makeLabel(text: string, highlighted: boolean): THREE.Sprite {
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
   sprite.scale.set(2.2, 0.55, 1);
   return sprite;
+}
+
+type HeroLcdVisual = { ctx: CanvasRenderingContext2D; tex: THREE.CanvasTexture; view: HeroLcdView };
+
+function drawHeroLcd(visual: HeroLcdVisual, data: HeroLcdData): void {
+  const ctx = visual.ctx;
+  const width = ctx.canvas.width;
+  const height = ctx.canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, '#071a26');
+  gradient.addColorStop(1, '#031019');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = 'rgba(67, 232, 255, 0.08)';
+  ctx.fillRect(0, 0, width, 22);
+  ctx.strokeStyle = 'rgba(77, 220, 245, 0.16)';
+  ctx.lineWidth = 1;
+  for (let y = 0; y < height; y += 8) {
+    ctx.beginPath();
+    ctx.moveTo(0, y + 0.5);
+    ctx.lineTo(width, y + 0.5);
+    ctx.stroke();
+  }
+  ctx.font = '600 13px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#8cf7ff';
+  heroLcdLines(visual.view, data).forEach((line, index) => {
+    ctx.fillText(line, 10, 17 + index * 31);
+  });
+  visual.tex.needsUpdate = true;
+}
+
+type HeroBuild = {
+  group: THREE.Group;
+  lcd: HeroLcdVisual;
+  lcdMesh: THREE.Mesh;
+  hitMeshes: THREE.Mesh[];
+  usrLed: THREE.Mesh;
+};
+
+function makeHeroCcr1072(data: HeroLcdData, view: HeroLcdView): HeroBuild {
+  const group = new THREE.Group();
+  const height = HERO_KIND_SPEC.height;
+  const depth = HERO_KIND_SPEC.depth;
+  const centerY = height / 2;
+  const frontZ = depth / 2;
+  const itemZ = frontZ + 0.033;
+
+  const bodyMat = new THREE.MeshStandardMaterial({ color: HERO_KIND_SPEC.color, roughness: 0.36, metalness: 0.58 });
+  const faceMat = new THREE.MeshStandardMaterial({ color: HERO_KIND_SPEC.face, roughness: 0.4, metalness: 0.42 });
+  const bezelMat = new THREE.MeshStandardMaterial({ color: HERO_KIND_SPEC.bezel, roughness: 0.48, metalness: 0.52 });
+  const metalMat = new THREE.MeshStandardMaterial({ color: 0xaab4be, roughness: 0.28, metalness: 0.88 });
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x070a0d, roughness: 0.3, metalness: 0.38 });
+  const claspMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.42, metalness: 0.16 });
+  const lcdFrameMat = new THREE.MeshStandardMaterial({ color: 0x080d12, roughness: 0.34, metalness: 0.68, emissive: 0x0a3440, emissiveIntensity: 0.3 });
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.72, height, depth), bodyMat);
+  body.position.y = centerY;
+  group.add(body);
+
+  const bezel = new THREE.Mesh(new THREE.BoxGeometry(1.68, 0.235, 0.03), bezelMat);
+  bezel.position.set(0, centerY, frontZ + 0.006);
+  group.add(bezel);
+
+  const face = new THREE.Mesh(new THREE.BoxGeometry(1.58, 0.205, 0.012), faceMat);
+  face.position.set(0, centerY, frontZ + 0.022);
+  group.add(face);
+
+  const nameCanvas = document.createElement('canvas');
+  nameCanvas.width = 512;
+  nameCanvas.height = 96;
+  const nameCtx = nameCanvas.getContext('2d')!;
+  nameCtx.fillStyle = '#11171d';
+  nameCtx.fillRect(0, 0, 512, 96);
+  nameCtx.strokeStyle = '#52616f';
+  nameCtx.lineWidth = 4;
+  nameCtx.strokeRect(3, 3, 506, 90);
+  nameCtx.fillStyle = '#dbe7f0';
+  nameCtx.font = '600 27px system-ui, sans-serif';
+  nameCtx.textAlign = 'center';
+  nameCtx.textBaseline = 'middle';
+  nameCtx.fillText('CCR1072-1G-8S+', 256, 27);
+  nameCtx.fillStyle = '#43d6c4';
+  nameCtx.font = 'italic 700 34px system-ui, sans-serif';
+  nameCtx.fillText('MikroTik', 256, 68);
+  nameCtx.strokeStyle = '#43d6c4';
+  nameCtx.lineWidth = 5;
+  nameCtx.beginPath();
+  nameCtx.moveTo(58, 77);
+  nameCtx.lineTo(78, 20);
+  nameCtx.moveTo(72, 77);
+  nameCtx.lineTo(92, 20);
+  nameCtx.stroke();
+  const nameTex = new THREE.CanvasTexture(nameCanvas);
+  nameTex.colorSpace = THREE.SRGBColorSpace;
+  const nameplate = new THREE.Mesh(new THREE.PlaneGeometry(0.39, 0.052), new THREE.MeshBasicMaterial({ map: nameTex }));
+  nameplate.position.set(-0.52, 0.028, frontZ + 0.023);
+  group.add(nameplate);
+
+  const lcdCanvas = document.createElement('canvas');
+  lcdCanvas.width = 256;
+  lcdCanvas.height = 144;
+  const lcdCtx = lcdCanvas.getContext('2d')!;
+  const lcdTex = new THREE.CanvasTexture(lcdCanvas);
+  lcdTex.colorSpace = THREE.SRGBColorSpace;
+  const lcdVisual: HeroLcdVisual = { ctx: lcdCtx, tex: lcdTex, view };
+  drawHeroLcd(lcdVisual, data);
+
+  const lcdFrame = new THREE.Mesh(new THREE.BoxGeometry(0.37, 0.215, 0.024), lcdFrameMat);
+  lcdFrame.position.set(-0.52, 0.16, itemZ);
+  group.add(lcdFrame);
+  const lcdMesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.34, 0.19),
+    new THREE.MeshStandardMaterial({
+      map: lcdTex,
+      emissive: 0xffffff,
+      emissiveMap: lcdTex,
+      emissiveIntensity: 0.58,
+      roughness: 0.28,
+      metalness: 0.04,
+    }),
+  );
+  lcdMesh.position.set(-0.52, 0.16, itemZ + 0.014);
+  lcdMesh.userData.heroLcd = true;
+  lcdMesh.userData.label = 'CCR1072-1G-8S+ LCD';
+  group.add(lcdMesh);
+
+  for (let index = 0; index < 8; index++) {
+    const x = -0.25 + index * 0.085;
+    const cage = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.05, 0.022), metalMat);
+    cage.position.set(x, 0.13, itemZ);
+    group.add(cage);
+    const clasp = new THREE.Mesh(new THREE.BoxGeometry(0.013, 0.034, 0.012), claspMat);
+    clasp.position.set(x + 0.019, 0.13, itemZ + 0.018);
+    group.add(clasp);
+  }
+
+  const rj45 = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.06, 0.028), darkMat);
+  rj45.position.set(0.49, 0.13, itemZ);
+  group.add(rj45);
+  const rj45Notch = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.012, 0.03), metalMat);
+  rj45Notch.position.set(0.49, 0.153, itemZ + 0.006);
+  group.add(rj45Notch);
+  const usb = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.022, 0.016), darkMat);
+  usb.position.set(0.66, 0.13, itemZ);
+  group.add(usb);
+  const serial = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.035, 0.018), metalMat);
+  serial.position.set(0.79, 0.13, itemZ);
+  group.add(serial);
+  const serialCore = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.022, 0.02), darkMat);
+  serialCore.position.set(0.79, 0.13, itemZ + 0.006);
+  group.add(serialCore);
+
+  const pwrLed = new THREE.Mesh(
+    new THREE.SphereGeometry(0.014, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x22c55e, emissiveIntensity: 1.35 }),
+  );
+  pwrLed.position.set(-0.79, 0.18, itemZ + 0.004);
+  group.add(pwrLed);
+  const usrLed = new THREE.Mesh(
+    new THREE.SphereGeometry(0.014, 8, 8),
+    new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xfbbf24, emissiveIntensity: 1 }),
+  );
+  usrLed.position.set(-0.79, 0.09, itemZ + 0.004);
+  group.add(usrLed);
+
+  const hitbox = new THREE.Mesh(
+    new THREE.BoxGeometry(1.72, height, depth),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }),
+  );
+  hitbox.position.y = centerY;
+  hitbox.userData.heroTerminal = true;
+  hitbox.userData.label = 'CCR1072-1G-8S+';
+  hitbox.userData.baseColor = HERO_KIND_SPEC.color;
+  hitbox.userData.hoverColor = new THREE.Color(HERO_KIND_SPEC.color).offsetHSL(0, 0, 0.18).getHex();
+  group.add(hitbox);
+
+  return { group, lcd: lcdVisual, lcdMesh, hitMeshes: [hitbox, lcdMesh], usrLed };
 }
 
 function disposeGroup(group: THREE.Group) {
@@ -439,6 +639,18 @@ type NearbyPrompt =
   | { key: string; label: string; kind: 'maintenance'; action: MaintenanceAction }
   | { key: string; label: string; kind: 'storage'; pickup: Carrying }
   | { key: string; label: string; kind: 'nocPc' }
+  | {
+      key: string;
+      label: string;
+      kind: 'heroTerminal';
+      doorRackKey: string;
+      doorOpen: boolean;
+      maintenanceAction: MaintenanceAction | null;
+      maintenanceLabel: string | null;
+      otherDoor: { rackKey: string; open: boolean; label: string } | null;
+      otherMaintenanceAction: MaintenanceAction | null;
+      otherMaintenanceLabel: string | null;
+    }
   | { key: string; label: string; kind: 'powerPanel' };
 
 type PowerBreakerVisual = { mesh: THREE.Mesh; aisle: Aisle; baseY: number };
@@ -466,10 +678,11 @@ type Props = {
   onPowerOn: () => void;
   onPowerOff: () => void;
   onRemoteOps: () => void;
+  onHeroTerminal: () => void;
   onOpenPowerPanel: () => void;
 };
 
-export default function Room3D({ devices, links, selectedId, linkStartId, onDeviceClick, onEmptyClick, room, onRoomChange, onScreenClick, nocData, powerGrid, carrying, onCarry, onMaintain, removedLinks, removedDevices, pcOn, interactionLocked, onPowerOn, onPowerOff, onRemoteOps, onOpenPowerPanel }: Props) {
+export default function Room3D({ devices, links, selectedId, linkStartId, onDeviceClick, onEmptyClick, room, onRoomChange, onScreenClick, nocData, powerGrid, carrying, onCarry, onMaintain, removedLinks, removedDevices, pcOn, interactionLocked, onPowerOn, onPowerOff, onRemoteOps, onHeroTerminal, onOpenPowerPanel }: Props) {
   const animatedTrafficRef = useRef<{ mesh: THREE.Mesh; curve: THREE.QuadraticBezierCurve3; phase: number }[]>([]);
   const animatedLedsRef = useRef<{ mesh: THREE.Mesh; phase: number; base: number }[]>([]);
   const serverFanRefs = useRef<THREE.Group[]>([]);
@@ -477,6 +690,10 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
   const powerBreakerRefs = useRef<PowerBreakerVisual[]>([]);
   const gensetRefs = useRef<GensetVisual[]>([]);
   const emergencyLensRef = useRef<THREE.Mesh | null>(null);
+  const heroHitMeshesRef = useRef<THREE.Mesh[]>([]);
+  const heroLcdRef = useRef<HeroLcdVisual | null>(null);
+  const heroLcdViewRef = useRef<HeroLcdView>('overview');
+  const heroStartedAtRef = useRef(0);
 
   const hostRef = useRef<HTMLDivElement>(null);
   const staticGroupRef = useRef<THREE.Group | null>(null);
@@ -525,6 +742,8 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
   onPowerOffRef.current = onPowerOff;
   const onRemoteOpsRef = useRef(onRemoteOps);
   onRemoteOpsRef.current = onRemoteOps;
+  const heroTerminalRef = useRef(onHeroTerminal);
+  heroTerminalRef.current = onHeroTerminal;
   const onOpenPowerPanelRef = useRef(onOpenPowerPanel);
   onOpenPowerPanelRef.current = onOpenPowerPanel;
   const deviceRackKeysRef = useRef<Map<string, string>>(new Map());
@@ -542,12 +761,26 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
     if (prompt.kind === 'door') toggleDoor(prompt.rackKey);
     else if (prompt.kind === 'maintenance') onMaintainRef.current(prompt.action);
     else if (prompt.kind === 'storage') onCarryRef.current(prompt.pickup);
+    else if (prompt.kind === 'heroTerminal') heroTerminalRef.current();
     else if (prompt.kind === 'powerPanel') onOpenPowerPanelRef.current();
     else if (pcOnRef.current) onRemoteOpsRef.current();
     else onPowerOnRef.current();
   };
   const runNearbyActionRef = useRef(runNearbyAction);
   runNearbyActionRef.current = runNearbyAction;
+  const cycleHeroLcd = () => {
+    const visual = heroLcdRef.current;
+    if (!visual) return;
+    const view = nextHeroLcdView(visual.view);
+    visual.view = view;
+    heroLcdViewRef.current = view;
+    const uptimeSeconds = heroStartedAtRef.current > 0
+      ? Math.floor((performance.now() - heroStartedAtRef.current) / 1000)
+      : 0;
+    drawHeroLcd(visual, heroLcdData(dataRef.current.sim, uptimeSeconds));
+  };
+  const cycleHeroLcdRef = useRef(cycleHeroLcd);
+  cycleHeroLcdRef.current = cycleHeroLcd;
   const setKey = (k: 'f' | 'b' | 'l' | 'r', v: boolean) => { keysRef.current[k] = v; };
   const resetView = () => {
     const f = fpRef.current;
@@ -652,6 +885,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
 
     const fp = { x: 0, z: -3.2, yaw: -Math.PI / 2, pitch: 0.02 };
     fpRef.current = fp;
+    heroStartedAtRef.current = performance.now();
 
     const tooltip = document.createElement('div');
     tooltip.className = 'room-tooltip';
@@ -691,17 +925,19 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(ndc, camera);
-      const hits = raycaster.intersectObjects([...deviceBodyRef.current, ...screenMeshesRef.current], false);
+      const hits = raycaster.intersectObjects([...deviceBodyRef.current, ...screenMeshesRef.current, ...heroHitMeshesRef.current], false);
       const m = hits.length ? hits[0].object as THREE.Mesh : null;
       if (m !== hovered) {
-        if (hovered) (hovered.material as THREE.MeshStandardMaterial).color.set(hovered.userData.baseColor);
+        if (hovered && !hovered.userData.heroLcd) (hovered.material as THREE.MeshStandardMaterial).color.set(hovered.userData.baseColor);
         hovered = m;
-        if (hovered) (hovered.material as THREE.MeshStandardMaterial).color.set(hovered.userData.hoverColor);
+        if (hovered && !hovered.userData.heroLcd) (hovered.material as THREE.MeshStandardMaterial).color.set(hovered.userData.hoverColor);
       }
       if (hovered) {
         const hLabel = (hovered.userData.label as string) ?? (hovered.userData.screen as string) ?? '';
         const hStatus = hovered.userData.status as DeviceStatus | undefined;
-        tooltip.textContent = hStatus ? `${hLabel} · ${STATUS_LABEL[hStatus]}` : `${hLabel} — klik untuk buka monitor`;
+        if (hovered.userData.heroLcd) tooltip.textContent = `${hLabel} — klik untuk ganti tampilan`;
+        else if (hovered.userData.heroTerminal) tooltip.textContent = `${hLabel} — klik untuk buka terminal`;
+        else tooltip.textContent = hStatus ? `${hLabel} · ${STATUS_LABEL[hStatus]}` : `${hLabel} — klik untuk buka monitor`;
         tooltip.style.left = `${e.clientX - rect.left + 14}px`;
         tooltip.style.top = `${e.clientY - rect.top + 14}px`;
         tooltip.style.display = 'block';
@@ -717,10 +953,12 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
         ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
         ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
         raycaster.setFromCamera(ndc, camera);
-        const hits = raycaster.intersectObjects([...deviceBodyRef.current, ...screenMeshesRef.current], false);
+        const hits = raycaster.intersectObjects([...deviceBodyRef.current, ...screenMeshesRef.current, ...heroHitMeshesRef.current], false);
         const hitObj = hits[0]?.object;
-        if (hitObj && hitObj.userData.screen) { audio.play('blip'); screenClickRef.current(hitObj.userData.screen as NocScreenId); }
-        else if (hitObj) { audio.play('click'); clickRef.current(hitObj.userData.id as string); }
+        if (hitObj?.userData.heroLcd) { audio.play('blip'); cycleHeroLcdRef.current(); }
+        else if (hitObj?.userData.heroTerminal) { audio.play('click'); heroTerminalRef.current(); }
+        else if (hitObj?.userData.screen) { audio.play('blip'); screenClickRef.current(hitObj.userData.screen as NocScreenId); }
+        else if (hitObj?.userData.id) { audio.play('click'); clickRef.current(hitObj.userData.id as string); }
         else emptyRef.current();
       }
       const pointerId = activePointerId;
@@ -812,6 +1050,8 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       if (roomRef.current === 'dc') {
         const data = dataRef.current;
         const statuses = new Map(data.lab.devices.map(device => [device.id, deviceStatus(device, data.lab)]));
+        const heroDoorKey = rackKey(HERO_RACK.rx, HERO_RACK.rz);
+        let heroMaintenanceAction: MaintenanceAction | null = null;
         let nearestMaintenance: { action: MaintenanceAction; distance: number } | null = null;
         let nearestDoor: { rackKey: string; distance: number; open: boolean } | null = null;
         for (const rc of RACK_COORDS) {
@@ -835,11 +1075,53 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
             deviceRackKeys: deviceRackKeysRef.current,
             statuses,
           });
+          if (action && key === heroDoorKey) heroMaintenanceAction = action;
           if (action && (!nearestMaintenance || distance < nearestMaintenance.distance)) {
             nearestMaintenance = { action, distance };
           }
         }
-        if (nearestMaintenance) {
+        const heroDoorOpen = openDoorsRef.current.has(heroDoorKey);
+        const heroDistance = Math.hypot(HERO_FRONT_POSITION.x - fp.x, HERO_FRONT_POSITION.z - fp.z);
+        if (heroDistance <= 2.4) {
+          const heroTargetId = heroMaintenanceAction
+            ? ('linkId' in heroMaintenanceAction ? heroMaintenanceAction.linkId : heroMaintenanceAction.id)
+            : 'none';
+          const otherDoor = nearestDoor && nearestDoor.rackKey !== heroDoorKey ? nearestDoor : null;
+          const otherDoorIndex = otherDoor
+            ? RACK_COORDS.findIndex(rc => rackKey(rc.rx, rc.rz) === otherDoor.rackKey)
+            : -1;
+          const otherMaintenanceAction = nearestMaintenance && (
+            !heroMaintenanceAction
+            || maintenanceActionIdentity(nearestMaintenance.action) !== maintenanceActionIdentity(heroMaintenanceAction)
+          )
+            ? nearestMaintenance.action
+            : null;
+          const otherTargetId = otherMaintenanceAction
+            ? ('linkId' in otherMaintenanceAction ? otherMaintenanceAction.linkId : otherMaintenanceAction.id)
+            : 'none';
+          nextPrompt = {
+            key: `hero-ccr1072:${heroDoorOpen ? 'open' : 'closed'}:${heroMaintenanceAction?.type ?? 'none'}:${heroTargetId}:${otherDoor?.rackKey ?? 'none'}:${otherDoor?.open ? 'open' : 'closed'}:${otherMaintenanceAction?.type ?? 'none'}:${otherTargetId}`,
+            label: 'Buka Terminal CCR1072',
+            kind: 'heroTerminal',
+            doorRackKey: heroDoorKey,
+            doorOpen: heroDoorOpen,
+            maintenanceAction: heroMaintenanceAction,
+            maintenanceLabel: heroMaintenanceAction
+              ? maintenanceActionLabel(heroMaintenanceAction, data.lab.devices, data.lab.links)
+              : null,
+            otherDoor: otherDoor
+              ? {
+                  rackKey: otherDoor.rackKey,
+                  open: otherDoor.open,
+                  label: `${otherDoor.open ? 'Tutup' : 'Buka'} Pintu Rak ${otherDoorIndex + 1}`,
+                }
+              : null,
+            otherMaintenanceAction,
+            otherMaintenanceLabel: otherMaintenanceAction
+              ? maintenanceActionLabel(otherMaintenanceAction, data.lab.devices, data.lab.links)
+              : null,
+          };
+        } else if (nearestMaintenance) {
           const action = nearestMaintenance.action;
           const targetId = 'linkId' in action ? action.linkId : action.id;
           nextPrompt = {
@@ -965,6 +1247,11 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
           drawScreen(sm.userData.screen as NocScreenId, res.ctx, res.ctx.canvas.width, res.ctx.canvas.height, { ...data, sim });
           res.tex.needsUpdate = true;
         }
+        const heroLcd = heroLcdRef.current;
+        if (heroLcd) {
+          const uptimeSeconds = Math.floor((now - heroStartedAtRef.current) / 1000);
+          drawHeroLcd(heroLcd, heroLcdData(sim, uptimeSeconds));
+        }
       }
       renderer.render(scene, camera);
     };
@@ -983,6 +1270,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       camera.remove(listener);
       try { listener.gain.disconnect(); } catch {}
       audio.detach(listener);
+      heroLcdRef.current?.tex.dispose();
       if (staticGroupRef.current) disposeGroup(staticGroupRef.current);
       if (dynamicGroupRef.current) disposeGroup(dynamicGroupRef.current);
       environmentTarget.dispose();
@@ -1002,6 +1290,8 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       powerBreakerRefs.current = [];
       gensetRefs.current = [];
       emergencyLensRef.current = null;
+      heroLcdRef.current = null;
+      heroHitMeshesRef.current = [];
       fpRef.current = null;
       nearbyPromptRef.current = null;
     };
@@ -1014,6 +1304,9 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
     gensetRefs.current = [];
     emergencyLensRef.current = null;
     let cancelled = false;
+    heroLcdRef.current?.tex.dispose();
+    heroLcdRef.current = null;
+    heroHitMeshesRef.current = [];
     disposeGroup(sGroup);
     while (sGroup.children.length) sGroup.remove(sGroup.children[0]);
     deviceBodyRef.current = [];
@@ -1926,10 +2219,21 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       pendingPanel.push({ file: ppFile, maxHeight: ppMaxH, placeholder: ppPlaceholder, x: nr.rx, yBottom: ppY, zCenter: nr.rz, yaw: nr.yaw });
     }
 
+    {
+      const hero = makeHeroCcr1072(heroLcdData(dataRef.current.sim, 0), heroLcdViewRef.current);
+      hero.group.position.set(nr.rx, NOC_HERO_Y, nr.rz);
+      hero.group.rotation.y = nr.yaw;
+      sGroup.add(hero.group);
+      heroLcdRef.current = hero.lcd;
+      heroHitMeshesRef.current = hero.hitMeshes;
+      extraLeds.push({ mesh: hero.usrLed, phase: 1.7, base: 0.9 });
+      verifyUnit(hero.group, nr.rx, nr.rz, nr.yaw, 'CCR1072-1G-8S+');
+    }
+
     // Fill the remaining cabinet slots with deterministic server units.
     for (let r = 0; r < rackCoords.length; r++) {
       const rc = rackCoords[r];
-      const cap = r === NOC_RACK ? RACK_H - 0.62 : RACK_H - 1.05;
+      const cap = r === NOC_RACK ? NOC_HERO_Y - 0.01 : RACK_H - 1.05;
       let y = usedY[r];
       let slot = 0;
       for (;;) {
@@ -2189,6 +2493,20 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
           </button>
           {nearbyPrompt.kind === 'nocPc' && pcOn && (
             <button className="device-interact-secondary" onPointerDown={e => e.stopPropagation()} onClick={() => onPowerOffRef.current()}>Matikan PC</button>
+          )}
+          {nearbyPrompt.kind === 'heroTerminal' && (
+            <>
+              <button className="device-interact-secondary" onPointerDown={e => e.stopPropagation()} onClick={() => toggleDoor(nearbyPrompt.doorRackKey)}>{nearbyPrompt.doorOpen ? 'Tutup Pintu Rak NOC' : 'Buka Pintu Rak NOC'}</button>
+              {nearbyPrompt.maintenanceAction && nearbyPrompt.maintenanceLabel && (
+                <button className="device-interact-secondary" onPointerDown={e => e.stopPropagation()} onClick={() => { const action = nearbyPrompt.maintenanceAction; if (action) onMaintainRef.current(action); }}>{nearbyPrompt.maintenanceLabel}</button>
+              )}
+              {nearbyPrompt.otherDoor && (
+                <button className="device-interact-secondary" onPointerDown={e => e.stopPropagation()} onClick={() => { const door = nearbyPrompt.otherDoor; if (door) toggleDoor(door.rackKey); }}>{nearbyPrompt.otherDoor.label}</button>
+              )}
+              {nearbyPrompt.otherMaintenanceAction && nearbyPrompt.otherMaintenanceLabel && (
+                <button className="device-interact-secondary" onPointerDown={e => e.stopPropagation()} onClick={() => { const action = nearbyPrompt.otherMaintenanceAction; if (action) onMaintainRef.current(action); }}>{nearbyPrompt.otherMaintenanceLabel}</button>
+              )}
+            </>
           )}
         </div>
       )}
