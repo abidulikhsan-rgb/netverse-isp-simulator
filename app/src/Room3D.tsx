@@ -9,6 +9,7 @@ import { drawScreen, type NocScreenId, type NocData } from './nocScreens';
 import { heroLcdData, heroLcdLines, nextHeroLcdView, type HeroLcdData, type HeroLcdView } from './heroLcd';
 import { audio } from './audio';
 import { loadNetverseAsset } from './three-loader';
+import { computeRackGlbFit } from './rackGlbFit';
 import { maintenanceActionLabel, rackKey, selectRackAction, selectStoragePickup, type Carrying, type MaintenanceAction } from './maintenance';
 
 type PortStyle = 'rj45' | 'sfp';
@@ -204,6 +205,73 @@ const DOOR_TOGGLE_SPEED = 10;
 type RackDoorRef = { rackKey: string; doorGroup: THREE.Group };
 type RackBuild = { group: THREE.Group; doorGroup: THREE.Group };
 
+const RACK_SHELL_NAME = 'rack-static-shell';
+const RACK_DOOR_NAME = 'rack-gameplay-door';
+const RACK_REAR_DOOR_NAME = 'rack-rear-door';
+let rackTemplatePromise: Promise<THREE.Group | null> | null = null;
+let rackTemplateFallbackLogged = false;
+
+function loadRackTemplateOnce(): Promise<THREE.Group | null> {
+  if (!rackTemplatePromise) {
+    rackTemplatePromise = loadNetverseAsset('rack_42u.glb')
+      .then(prepareRackGlbTemplate)
+      .catch(() => {
+        rackTemplatePromise = null;
+        return null;
+      });
+  }
+  return rackTemplatePromise;
+}
+
+function prepareRackGlbTemplate(template: THREE.Group): THREE.Group | null {
+  const prepared = new THREE.Group();
+  const model = template.clone(true);
+  model.rotation.x = -Math.PI / 2;
+  prepared.add(model);
+  prepared.updateMatrixWorld(true);
+
+  const box = new THREE.Box3().setFromObject(model);
+  const fit = computeRackGlbFit(
+    {
+      min: { x: box.min.x, y: box.min.y, z: box.min.z },
+      max: { x: box.max.x, y: box.max.y, z: box.max.z },
+    },
+    RACK_W,
+    RACK_H,
+    RACK_D,
+  );
+  if (!fit) {
+    if (!rackTemplateFallbackLogged) {
+      console.info('rack_42u.glb ratio mismatch; using procedural rack fallback.');
+      rackTemplateFallbackLogged = true;
+    }
+    return null;
+  }
+  if (fit.scale <= 0) return null;
+  prepared.scale.setScalar(fit.scale);
+  prepared.position.set(fit.offset.x, fit.offset.y, fit.offset.z);
+
+  model.traverse((obj) => {
+    if (!(obj instanceof THREE.Mesh)) return;
+    const name = obj.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (name.includes('door') || name === 'front' || name.includes('frontpanel')) {
+      obj.visible = false;
+    }
+  });
+
+  return prepared;
+}
+
+function applyRackGlbTemplate(rackGroup: THREE.Group, template: THREE.Group): void {
+  const shell = rackGroup.getObjectByName(RACK_SHELL_NAME);
+  if (shell) shell.visible = false;
+  const door = rackGroup.getObjectByName(RACK_DOOR_NAME);
+  if (door) door.position.z = 0.015;
+  const rearDoor = rackGroup.getObjectByName(RACK_REAR_DOOR_NAME);
+  if (rearDoor) rearDoor.position.z = -0.395;
+  rackGroup.add(template.clone(true));
+}
+
 type RackMaterials = {
   metal: THREE.MeshStandardMaterial;
   panel: THREE.MeshStandardMaterial;
@@ -227,52 +295,56 @@ function makeRackClosed(rx: number, rz: number, yaw: number, m: RackMaterials): 
   const frontZ = D / 2;
   const backZ = -D / 2;
 
+  const shell = new THREE.Group();
+  shell.name = RACK_SHELL_NAME;
+  g.add(shell);
+
   // Four corner posts plus top/bottom frames.
   for (const [px, pz] of [[xl + 0.04, frontZ - 0.04], [xr - 0.04, frontZ - 0.04], [xl + 0.04, backZ + 0.04], [xr - 0.04, backZ + 0.04]] as const) {
     const post = new THREE.Mesh(new THREE.BoxGeometry(0.07, H, 0.07), m.metal);
     post.position.set(px, H / 2, pz);
-    g.add(post);
+    shell.add(post);
   }
   for (const y of [0.05, H - 0.05]) {
     for (const pz of [frontZ - 0.04, backZ + 0.04]) {
       const beam = new THREE.Mesh(new THREE.BoxGeometry(W, 0.08, 0.08), m.metal);
       beam.position.set(0, y, pz);
-      g.add(beam);
+      shell.add(beam);
     }
     for (const px of [xl + 0.04, xr - 0.04]) {
       const beam = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, D), m.metal);
       beam.position.set(px, y, 0);
-      g.add(beam);
+      shell.add(beam);
     }
   }
 
   // Solid side panels: cabinet is fully enclosed left/right.
   const sideOuter = new THREE.Mesh(new THREE.BoxGeometry(0.035, H - 0.22, D - 0.16), m.outer);
   sideOuter.position.set(xl + 0.06, H / 2, 0);
-  g.add(sideOuter);
+  shell.add(sideOuter);
   const sideInner = new THREE.Mesh(new THREE.BoxGeometry(0.035, H - 0.22, D - 0.16), m.panel);
   sideInner.position.set(xr - 0.06, H / 2, 0);
-  g.add(sideInner);
+  shell.add(sideInner);
 
   // Roof + two cable-entry cut-outs (dark recessed boxes).
   const roof = new THREE.Mesh(new THREE.BoxGeometry(W, 0.05, D), m.metal);
   roof.position.set(0, H - 0.01, 0);
-  g.add(roof);
+  shell.add(roof);
   for (const hx of [-0.42, 0.42]) {
     const hole = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.045, 0.26), m.cable);
     hole.position.set(hx, H + 0.002, -0.12);
-    g.add(hole);
+    shell.add(hole);
   }
 
   // Rack floor and four feet.
   const rackFloor = new THREE.Mesh(new THREE.BoxGeometry(W - 0.16, 0.04, D - 0.16), m.floor);
   rackFloor.position.set(0, 0.07, 0);
-  g.add(rackFloor);
+  shell.add(rackFloor);
   for (const fx of [xl + 0.14, xr - 0.14]) {
     for (const fz of [frontZ - 0.14, backZ + 0.14]) {
       const foot = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.1, 0.17), m.dark);
       foot.position.set(fx, -0.03, fz);
-      g.add(foot);
+      shell.add(foot);
     }
   }
 
@@ -280,6 +352,7 @@ function makeRackClosed(rx: number, rz: number, yaw: number, m: RackMaterials): 
   doorGroup.position.set(-0.85, 0, frontZ);
   g.add(doorGroup);
   const door = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 5.2), m.door);
+  door.name = RACK_DOOR_NAME;
   door.position.set(0.85, 2.7, 0);
   doorGroup.add(door);
   for (const fx of [-0.87, 0.87]) {
@@ -306,6 +379,7 @@ function makeRackClosed(rx: number, rz: number, yaw: number, m: RackMaterials): 
 
   // Solid rear door (opposite the aisle).
   const rear = new THREE.Mesh(new THREE.BoxGeometry(W - 0.12, H - 0.22, 0.035), m.dark);
+  rear.name = RACK_REAR_DOOR_NAME;
   rear.position.set(0, H / 2, backZ + 0.02);
   g.add(rear);
 
@@ -1324,6 +1398,8 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
     const pendingLab: PendingLab[] = [];
     const pendingPanel: PendingPanel[] = [];
     const pendingStorage: { file: string; parent: THREE.Group; x: number; yBottom: number; z: number; maxWidth: number; maxHeight: number; maxDepth: number }[] = [];
+    const rackGroups: THREE.Group[] = [];
+    const rackTemplatePromise = loadRackTemplateOnce();
     const pos = new Map<string, THREE.Vector3>();
     const portLocal = new Map<string, THREE.Vector3>();
 
@@ -1917,6 +1993,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       const key = rackKey(rc.rx, rc.rz);
       built.doorGroup.rotation.y = openDoorsRef.current.has(key) ? DOOR_OPEN_ANGLE : 0;
       doorRefsRef.current.push({ rackKey: key, doorGroup: built.doorGroup });
+      rackGroups.push(built.group);
       sGroup.add(built.group);
     }
 
@@ -2379,6 +2456,15 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       });
     }
 
+    const loadRacks = async () => {
+      const rackTemplate = await rackTemplatePromise;
+      if (cancelled || !rackTemplate) return;
+      for (const rackGroup of rackGroups) {
+        if (cancelled) return;
+        applyRackGlbTemplate(rackGroup, rackTemplate);
+      }
+    };
+
     const loadFillers = async () => {
       const byFile = new Map<string, FillerSlot[]>();
       for (const slot of fillerSlots) {
@@ -2471,6 +2557,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
     // Serialise the loads so each GLB file is fetched/parsed only once even when
     // both a filler rack and a lab device use the same model.
     void (async () => {
+      const rackLoad = loadRacks();
       await loadFillers();
       if (cancelled) return;
       await loadLab();
@@ -2478,6 +2565,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
       await loadPanel();
       if (cancelled) return;
       await loadStorage();
+      await rackLoad;
     })();
 
     return () => {
