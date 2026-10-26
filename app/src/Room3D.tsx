@@ -718,6 +718,7 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
   roomChangeRef.current = onRoomChange;
   const roomRef = useRef(room);
   roomRef.current = room;
+  const previousRoomRef = useRef<typeof room | null>(null);
   const dataRef = useRef(nocData);
   dataRef.current = nocData;
   const powerGridRef = useRef(powerGrid);
@@ -801,13 +802,20 @@ export default function Room3D({ devices, links, selectedId, linkStartId, onDevi
   };
 
   useEffect(() => {
+    const previousRoom = previousRoomRef.current;
+    previousRoomRef.current = room;
     const f = fpRef.current;
     if (!f) return;
     if (room === 'noc') { f.x = 0; f.z = 7.4; f.yaw = Math.PI; f.pitch = 0.02; }
     else if (room === 'power') { f.x = 8.5; f.z = 10; f.yaw = Math.PI / 2; f.pitch = 0.02; }
     else if (room === 'gudang') { f.x = -8.5; f.z = 10; f.yaw = -Math.PI / 2; f.pitch = 0.02; }
     else { f.x = 0; f.z = -3.2; f.yaw = -Math.PI / 2; f.pitch = 0.02; }
-    audio.play('door');
+    if (previousRoom !== null && previousRoom !== room) {
+      audio.play('doorclose');
+      audio.play('door', 0.5);
+    } else {
+      audio.play('door');
+    }
     audio.setRoomMix(room);
   }, [room]);
 

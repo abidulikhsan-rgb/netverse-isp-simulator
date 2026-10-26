@@ -220,6 +220,7 @@ export default function App() {
   const [removedLinks, setRemovedLinks] = useState<Set<string>>(() => new Set());
   const [removedDevices, setRemovedDevices] = useState<Set<string>>(() => new Set());
   const historyRef = useRef<string[]>([]);
+  const heroTerminalPoweredRef = useRef(false);
   const previousPowerGridRef = useRef<PowerGrid>(powerGrid);
   const chaosBlackoutNoticeRef = useRef(false);
   const [histIdx, setHistIdx] = useState(-1);
@@ -307,6 +308,10 @@ export default function App() {
     setTerminalDevice(router.id);
     setShowTerminal(true);
     setNotice(`Terminal CCR1072 terhubung ke ${router.name}`);
+    if (!heroTerminalPoweredRef.current) {
+      heroTerminalPoweredRef.current = true;
+      audio.play('poweron');
+    }
   };
   const patchDevice = (id: string, patch: Partial<Device> | ((d: Device) => Device)) => setLab(s => ({ ...s, devices: s.devices.map(d => d.id !== id ? d : typeof patch === 'function' ? patch(d) : { ...d, ...patch }) }));
   useEffect(() => {
@@ -358,7 +363,7 @@ export default function App() {
       setRemovedLinks(previous => clearRemovedLink(previous, action.linkId));
       setCarrying(null);
       audio.play('resolve');
-      audio.play('install');
+      audio.play('install', 0.35);
       pushLog(`Installed patch cord ${nameOf(link.from)} ↔ ${nameOf(link.to)}`);
       setNotice('Kabel terpasang — link pulih');
       return;
@@ -384,7 +389,7 @@ export default function App() {
     });
     setCarrying(null);
     audio.play('resolve');
-    audio.play('install');
+    audio.play('install', 0.35);
     pushLog(`Installed replacement device ${target.name}`);
     setNotice('Perangkat terpasang — kembali online');
   };

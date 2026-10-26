@@ -1,15 +1,85 @@
 import * as THREE from 'three';
 
-// NetVerse audio engine — 100% procedural Web Audio synthesis (no asset files,
-// no licensing issues, no extra dependencies). Sounds are stylized synthetic
-// renderings, NOT field recordings: the UI must not claim recorded realism.
+// NetVerse audio engine — hybrid source of sound: recorded CC0 game assets
+// (Kenney Interface Sounds + Sci-Fi Sounds, public domain) are the primary
+// material for ambience and one-shots, while the procedural Web Audio
+// synthesis below stays as the mandatory fallback whenever an asset is
+// missing, fails to fetch, or fails to decode. These are game assets, not
+// field recordings of a real server room, and loading never blocks rendering.
 
+export const SOUND_NAMES = [
+  'click',
+  'blip',
+  'step',
+  'door',
+  'doorclose',
+  'unplug',
+  'install',
+  'poweron',
+  'alarm-warning',
+  'alarm-offline',
+  'alarm-linkdown',
+  'alarm-critical',
+  'resolve',
+] as const;
+
+export type SoundName = (typeof SOUND_NAMES)[number];
 export type AudioSettings = { master: number; ambience: number; effects: number; alarms: number; muted: boolean };
-export type SoundName = 'click' | 'blip' | 'step' | 'door' | 'unplug' | 'install' | 'poweron' | 'alarm-warning' | 'alarm-offline' | 'alarm-linkdown' | 'alarm-critical' | 'resolve';
 type Bus = 'ambience' | 'effects' | 'alarms';
+
+export const ASSET_FILES: Record<SoundName, string> = {
+  click: 'click',
+  blip: 'blip',
+  step: 'step',
+  door: 'door_open',
+  doorclose: 'door_close',
+  unplug: 'unplug',
+  install: 'install',
+  poweron: 'poweron',
+  'alarm-warning': 'alarm_warning',
+  'alarm-offline': 'alarm_offline',
+  'alarm-linkdown': 'alarm_linkdown',
+  'alarm-critical': 'alarm_critical',
+  resolve: 'install',
+};
+
+export const AMBIENCE_FILES: Record<'dc' | 'noc', string> = {
+  dc: 'dc_ambience',
+  noc: 'noc_ambience',
+};
+
+export type SoundSource =
+  | { kind: 'asset'; file: string }
+  | { kind: 'procedural'; name: SoundName };
+
+export function resolveSoundSource(name: SoundName, loaded: ReadonlySet<string>): SoundSource {
+  const file = ASSET_FILES[name];
+  if (loaded.has(file)) return { kind: 'asset', file };
+  return { kind: 'procedural', name };
+}
+
+export function assetUrl(file: string): string {
+  return `${import.meta.env.BASE_URL || '/'}audio/netverse/${file}.ogg`;
+}
 
 const STORAGE_KEY = 'netverse-audio-v1';
 const DEFAULTS: AudioSettings = { master: 0.7, ambience: 0.6, effects: 0.8, alarms: 0.8, muted: false };
+
+const MIX: Record<SoundName, { bus: Bus; gain: number; rate: number; jitter: number }> = {
+  click: { bus: 'effects', gain: 0.5, rate: 0.9, jitter: 0.2 },
+  blip: { bus: 'effects', gain: 0.25, rate: 1, jitter: 0 },
+  step: { bus: 'effects', gain: 0.3, rate: 0.85, jitter: 0.3 },
+  door: { bus: 'effects', gain: 0.5, rate: 1, jitter: 0 },
+  doorclose: { bus: 'effects', gain: 0.5, rate: 1, jitter: 0 },
+  unplug: { bus: 'effects', gain: 0.32, rate: 1, jitter: 0 },
+  install: { bus: 'effects', gain: 0.3, rate: 1, jitter: 0 },
+  poweron: { bus: 'effects', gain: 0.34, rate: 1, jitter: 0 },
+  'alarm-warning': { bus: 'alarms', gain: 0.4, rate: 1, jitter: 0 },
+  'alarm-offline': { bus: 'alarms', gain: 0.45, rate: 1, jitter: 0 },
+  'alarm-linkdown': { bus: 'alarms', gain: 0.28, rate: 1, jitter: 0 },
+  'alarm-critical': { bus: 'alarms', gain: 0.38, rate: 1, jitter: 0 },
+  resolve: { bus: 'alarms', gain: 0.3, rate: 1, jitter: 0 },
+};
 
 export function buildUnplugWave(sampleRate: number): Float32Array {
   const length = Math.max(1, Math.floor(sampleRate * 0.14));
@@ -91,6 +161,8 @@ class Engine {
   private master: GainNode | null = null;
   private buses: Record<Bus, GainNode> | null = null;
   private buf: Record<string, AudioBuffer> = {};
+  private assets: Map<string, AudioBuffer> = new Map();
+  private assetLoad: Promise<void> = Promise.resolve();
   private emitters: THREE.PositionalAudio[] = [];
 
   getSettings(): AudioSettings { return { ...this.settings }; }
@@ -105,6 +177,7 @@ class Engine {
     this.buses = { ambience: bus(), effects: bus(), alarms: bus() };
     this.buildBuffers(ctx);
     this.applySettings();
+    this.assetLoad = this.loadAssets(ctx).catch(() => undefined);
   }
 
   detach(listener: THREE.AudioListener) {
@@ -116,6 +189,12 @@ class Engine {
     this.master = null;
     this.buses = null;
     this.buf = {};
+    this.assets.clear();
+    this.assetLoad = Promise.resolve();
+  }
+
+  whenAssetsLoaded(): Promise<void> {
+    return this.assetLoad;
   }
 
   private buildBuffers(ctx: AudioContext) {
@@ -170,6 +249,19 @@ class Engine {
         d[i] = lp * Math.sin(Math.PI * Math.min(1, t / 0.45)) * 1.2;
       }
     }
+    const doorclose = mk(0.32);
+    {
+      const d = doorclose.getChannelData(0);
+      let lp = 0.6;
+      for (let i = 0; i < d.length; i++) {
+        const t = i / sr;
+        const n = Math.random() * 2 - 1;
+        const coeff = 0.35 * Math.exp(-t * 9) + 0.01;
+        lp += coeff * (n - lp);
+        const thunk = Math.sin(2 * Math.PI * 120 * t) * Math.exp(-t * 14);
+        d[i] = (lp * 1.1 + thunk * 0.45) * Math.exp(-t * 5);
+      }
+    }
     const click = mk(0.05);
     {
       const d = click.getChannelData(0);
@@ -184,7 +276,46 @@ class Engine {
     install.getChannelData(0).set(buildInstallWave(sr));
     const poweron = mk(0.42);
     poweron.getChannelData(0).set(buildPowerOnWave(sr));
-    this.buf = { fan, noc, step, door, click, unplug, install, poweron };
+    this.buf = { fan, noc, step, door, doorclose, click, unplug, install, poweron };
+  }
+
+  private async loadAssets(ctx: AudioContext): Promise<void> {
+    const files = [...new Set([...Object.values(ASSET_FILES), ...Object.values(AMBIENCE_FILES)])];
+    await Promise.all(files.map(async file => {
+      try {
+        const buffer = await this.fetchAsset(ctx, file);
+        if (!buffer) return;
+        if (this.listener?.context !== ctx) return;
+        this.assets.set(file, buffer);
+      } catch { /* asset unavailable — procedural fallback stays in charge */ }
+    }));
+    if (this.listener?.context !== ctx) return;
+    this.upgradeEmitters();
+  }
+
+  private async fetchAsset(ctx: AudioContext, file: string): Promise<AudioBuffer | null> {
+    if (typeof fetch !== 'function') return null;
+    if (typeof ctx.decodeAudioData !== 'function') return null;
+    const response = await fetch(assetUrl(file));
+    if (!response || !response.ok) return null;
+    const data = await response.arrayBuffer();
+    if (!data || data.byteLength === 0) return null;
+    return await ctx.decodeAudioData(data);
+  }
+
+  private upgradeEmitters() {
+    this.emitters.forEach(e => {
+      const kind = e.userData.kind as 'dc' | 'noc' | undefined;
+      if (!kind) return;
+      const file = AMBIENCE_FILES[kind];
+      const buffer = this.assets.get(file);
+      if (!buffer || e.userData.assetFile === file) return;
+      const wasPlaying = e.isPlaying;
+      if (wasPlaying) e.stop();
+      e.setBuffer(buffer);
+      e.userData.assetFile = file;
+      if (wasPlaying) e.play();
+    });
   }
 
   private applySettings() {
@@ -218,13 +349,16 @@ class Engine {
   makeEmitter(kind: 'dc' | 'noc'): THREE.PositionalAudio | null {
     if (!this.listener || !this.buses) return null;
     const e = new THREE.PositionalAudio(this.listener);
-    e.setBuffer(kind === 'dc' ? this.buf.fan : this.buf.noc);
+    const file = AMBIENCE_FILES[kind];
+    const asset = this.assets.get(file);
+    e.setBuffer(asset ?? (kind === 'dc' ? this.buf.fan : this.buf.noc));
+    e.userData.kind = kind;
+    e.userData.assetFile = asset ? file : '';
     e.setLoop(true);
     e.setRefDistance(2.5);
     e.setDistanceModel('exponential');
     e.setRolloffFactor(1.4);
     e.setVolume(kind === 'dc' ? 0.9 : 0.7);
-    e.userData.kind = kind;
     e.panner.disconnect();
     e.panner.connect(this.buses.ambience);
     this.emitters.push(e);
@@ -243,7 +377,7 @@ class Engine {
     });
   }
 
-  private shot(buf: AudioBuffer, bus: Bus, gain: number, rate = 1) {
+  private shot(buf: AudioBuffer, bus: Bus, gain: number, rate = 1, when?: number) {
     if (!this.listener || this.listener.context.state !== 'running') return;
     const ctx = this.listener.context;
     const src = ctx.createBufferSource();
@@ -253,7 +387,7 @@ class Engine {
     g.gain.value = gain;
     src.connect(g);
     g.connect(this.buses![bus]);
-    src.start();
+    src.start(when ?? ctx.currentTime);
   }
 
   private beep(freq: number, t0: number, dur: number, type: OscillatorType, bus: Bus, gain: number) {
@@ -273,20 +407,34 @@ class Engine {
     o.stop(t0 + dur + 0.03);
   }
 
-  play(name: SoundName) {
+  play(name: SoundName, delay = 0) {
     if (!this.listener || this.listener.context.state !== 'running' || !this.buses) return;
-    const t = this.listener.context.currentTime + 0.01;
+    const when = this.listener.context.currentTime + 0.01 + delay;
+    const source = resolveSoundSource(name, new Set(this.assets.keys()));
+    if (source.kind === 'asset') {
+      const buffer = this.assets.get(source.file);
+      if (buffer) {
+        const mix = MIX[name];
+        this.shot(buffer, mix.bus, mix.gain, mix.rate + Math.random() * mix.jitter, when);
+        return;
+      }
+    }
+    this.playProcedural(name, when);
+  }
+
+  private playProcedural(name: SoundName, t: number) {
     switch (name) {
-      case 'click': this.shot(this.buf.click, 'effects', 0.5, 0.9 + Math.random() * 0.2); break;
+      case 'click': this.shot(this.buf.click, 'effects', 0.5, 0.9 + Math.random() * 0.2, t); break;
       case 'blip':
         this.beep(880, t, 0.07, 'sine', 'effects', 0.25);
         this.beep(1320, t + 0.08, 0.09, 'sine', 'effects', 0.25);
         break;
-      case 'step': this.shot(this.buf.step, 'effects', 0.3, 0.85 + Math.random() * 0.3); break;
-      case 'door': this.shot(this.buf.door, 'effects', 0.5, 1); break;
-      case 'unplug': this.shot(this.buf.unplug, 'effects', 0.32, 1); break;
-      case 'install': this.shot(this.buf.install, 'effects', 0.3, 1); break;
-      case 'poweron': this.shot(this.buf.poweron, 'effects', 0.34, 1); break;
+      case 'step': this.shot(this.buf.step, 'effects', 0.3, 0.85 + Math.random() * 0.3, t); break;
+      case 'door': this.shot(this.buf.door, 'effects', 0.5, 1, t); break;
+      case 'doorclose': this.shot(this.buf.doorclose, 'effects', 0.5, 1, t); break;
+      case 'unplug': this.shot(this.buf.unplug, 'effects', 0.32, 1, t); break;
+      case 'install': this.shot(this.buf.install, 'effects', 0.3, 1, t); break;
+      case 'poweron': this.shot(this.buf.poweron, 'effects', 0.34, 1, t); break;
       case 'alarm-warning': this.beep(660, t, 0.16, 'sine', 'alarms', 0.4); break;
       case 'alarm-offline':
         this.beep(520, t, 0.14, 'sine', 'alarms', 0.45);
