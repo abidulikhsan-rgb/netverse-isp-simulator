@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0f14">
+<meta name="description" content="Katalog portofolio NetVerse Labs: simulator jaringan ISP 3D dengan NOC live, kode sumber terbuka, terminal server, dan modul lanjutan yang sedang dikerjakan.">
+<title>NetVerse — Katalog</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0f14'/%3E%3Crect x='6.5' y='2.5' width='19' height='27' rx='2' fill='none' stroke='%2322d3ee' stroke-width='2'/%3E%3Cpath d='M17 6l-4.6 8h3.3L13 20l6.4-8.6h-3.6L18 6z' fill='%2322d3ee'/%3E%3Cpath d='M9.5 23.5h13' stroke='%2322d3ee' stroke-width='2' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0a0f14;
+    --bg-raise:#0d141b;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.16);
+    --text:#dbe7f3;
+    --text-dim:#94a8bc;
+    --text-mute:#71869a;
+    --cyan:#22d3ee;
+    --green:#34d399;
+    --amber:#fbbf24;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --radius:4px;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.6;
+    color:var(--text);
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(1100px 480px at 50% -12%,rgba(34,211,238,.10),transparent 62%),
+      linear-gradient(rgba(255,255,255,.026) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.026) 1px,transparent 1px);
+    background-size:auto,52px 52px,52px 52px;
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    opacity:.05;
+    mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap{
+    width:100%;
+    max-width:1120px;
+    margin-inline:auto;
+    padding-inline:20px;
+    position:relative;
+    z-index:1;
+  }
+
+  a{color:inherit}
+
+  .skip{
+    position:absolute;
+    left:-9999px;
+    top:0;
+    background:var(--cyan);
+    color:#04242c;
+    padding:12px 18px;
+    font-weight:700;
+    z-index:10;
+  }
+  .skip:focus{left:12px;top:12px}
+
+  .label{
+    margin:0;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--text-mute);
+  }
+
+  .mono{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.06em;
+  }
+
+  /* ---------- header ---------- */
+  .topbar{
+    border-bottom:1px solid var(--line);
+    background:rgba(10,15,20,.72);
+    backdrop-filter:blur(6px);
+  }
+  .topbar__inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    min-height:44px;
+    padding-block:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--text-mute);
+  }
+  .topbar__inner span:last-child{color:var(--text-dim)}
+
+  .hero{padding-block:48px 34px}
+
+  .brand{display:flex;align-items:center;gap:14px}
+
+  .brand__mark{
+    width:42px;
+    height:42px;
+    flex:none;
+    border:1px solid rgba(34,211,238,.35);
+    border-radius:var(--radius);
+    background:rgba(34,211,238,.07);
+    box-shadow:0 0 26px -8px rgba(34,211,238,.55);
+  }
+
+  .brand__name{
+    margin:2px 0 0;
+    font-size:34px;
+    line-height:1.05;
+    font-weight:800;
+    letter-spacing:-.035em;
+  }
+  .brand__name em{
+    font-style:normal;
+    color:var(--cyan);
+  }
+
+  .tagline{
+    margin:22px 0 0;
+    max-width:46ch;
+    font-size:17px;
+    color:var(--text-dim);
+    text-wrap:pretty;
+  }
+
+  .status-strip{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 18px;
+    margin-top:26px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+  .status-strip .mono{color:var(--text-mute)}
+
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.02);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+
+  .dot{
+    width:8px;
+    height:8px;
+    flex:none;
+    border-radius:50%;
+    background:var(--text-mute);
+  }
+  .dot--live{
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(52,211,153,.55);
+    animation:pulse 2.8s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}
+    70%{box-shadow:0 0 0 7px rgba(52,211,153,0)}
+    100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}
+  }
+
+  /* ---------- katalog ---------- */
+  .catalog{padding-block:8px 56px}
+
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line-strong);
+    margin-bottom:22px;
+  }
+  .section-head h2{
+    margin:0;
+    font-size:13px;
+    font-family:var(--mono);
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    font-weight:600;
+  }
+  .section-head .mono{color:var(--text-mute)}
+
+  .grid{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:16px;
+  }
+
+  .card{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    padding:22px 20px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.028),rgba(255,255,255,0) 42%),
+      var(--bg-raise);
+    position:relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0 0 auto;
+    height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+  }
+  .card--feature{
+    border-color:rgba(34,211,238,.30);
+    background:
+      linear-gradient(180deg,rgba(34,211,238,.075),rgba(34,211,238,0) 38%),
+      var(--bg-raise);
+    box-shadow:0 18px 60px -40px rgba(34,211,238,.9);
+  }
+  .card--soon{
+    background:linear-gradient(180deg,rgba(255,255,255,.018),rgba(255,255,255,0) 42%),#0b1117;
+    border-style:dashed;
+    border-color:rgba(255,255,255,.12);
+  }
+  .card--soon .card__title{color:#9db1c4}
+  .card--soon .card__desc{color:var(--text-mute)}
+
+  .card__top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .card__idx{color:var(--text-mute)}
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:4px 9px;
+    border:1px solid var(--line-strong);
+    border-radius:2px;
+    font-family:var(--mono);
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    background:rgba(255,255,255,.03);
+  }
+  .badge--live{
+    color:var(--green);
+    border-color:rgba(52,211,153,.38);
+    background:rgba(52,211,153,.10);
+  }
+  .badge--open{
+    color:var(--cyan);
+    border-color:rgba(34,211,238,.38);
+    background:rgba(34,211,238,.10);
+  }
+  .badge--private{
+    color:var(--amber);
+    border-color:rgba(251,191,36,.34);
+    background:rgba(251,191,36,.08);
+  }
+  .badge--soon{
+    color:#93a7ba;
+    border-color:rgba(255,255,255,.18);
+    background:rgba(255,255,255,.035);
+  }
+
+  .card__title{
+    margin:0;
+    font-size:21px;
+    line-height:1.2;
+    font-weight:700;
+    letter-spacing:-.02em;
+    text-wrap:balance;
+  }
+  .card--feature .card__title{font-size:27px}
+
+  .card__desc{
+    margin:0;
+    color:var(--text-dim);
+    font-size:15px;
+    text-wrap:pretty;
+  }
+
+  .accent{
+    margin:0;
+    color:var(--cyan);
+    font-family:var(--mono);
+    font-size:11.5px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  .accent--muted{color:var(--text-mute)}
+
+  .card__foot{margin-top:auto;padding-top:6px}
+
+  /* ---------- tombol ---------- */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    min-height:48px;
+    padding:12px 18px;
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:15px;
+    font-weight:600;
+    letter-spacing:.01em;
+    text-decoration:none;
+    cursor:pointer;
+    transition:border-color .16s ease,color .16s ease,background-color .16s ease,box-shadow .16s ease;
+  }
+  .btn svg{width:15px;height:15px;flex:none}
+  .btn--primary{
+    background:var(--cyan);
+    border-color:var(--cyan);
+    color:#04242c;
+    box-shadow:0 0 24px -6px rgba(34,211,238,.55);
+  }
+  .btn--primary:hover{background:#67e8f9;border-color:#67e8f9}
+  .btn--ghost:hover{border-color:rgba(34,211,238,.55);color:var(--cyan);background:rgba(34,211,238,.07)}
+
+  .link-row{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:44px;
+    color:var(--text-dim);
+    font-size:14px;
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+  }
+  .link-row:hover{color:var(--cyan);border-bottom-color:rgba(34,211,238,.45)}
+
+  /* ---------- footer ---------- */
+  .site-foot{
+    border-top:1px solid var(--line);
+    background:rgba(8,12,16,.6);
+  }
+  .site-foot__inner{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px 18px;
+    padding-block:22px;
+    color:var(--text-mute);
+  }
+  .site-foot p{margin:0;font-size:13px}
+
+  :focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  @media (hover:hover){
+    .card:hover{border-color:rgba(34,211,238,.38)}
+    .card--feature:hover{box-shadow:0 18px 60px -34px rgba(34,211,238,1)}
+    .btn--ghost:hover{box-shadow:0 0 22px -12px rgba(34,211,238,.9)}
+  }
+
+  @media (min-width:680px){
+    .wrap{padding-inline:28px}
+    .hero{padding-block:64px 42px}
+    .brand__name{font-size:40px}
+    .tagline{font-size:18px}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .card--feature{grid-column:span 2}
+    .card{padding:26px 24px}
+  }
+
+  @media (min-width:1024px){
+    .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .card--feature{grid-column:span 2}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .dot--live{animation:none}
+    .btn{transition:none}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#katalog">Lewati ke katalog</a>
+
+<div class="topbar">
+  <div class="wrap topbar__inner">
+    <span>NetVerse // Katalog</span>
+    <span>HTTPS · 8443</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <svg class="brand__mark" viewBox="0 0 32 32" role="img" aria-label="Logo NetVerse: petir cyan di dalam rak server">
+        <rect x="6.5" y="2.5" width="19" height="27" rx="2" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".75"></rect>
+        <path d="M17 6l-4.6 8h3.3L13 20l6.4-8.6h-3.6L18 6z" fill="currentColor"></path>
+        <path d="M9.5 23.5h13M9.5 27h13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity=".45"></path>
+      </svg>
+      <div>
+        <p class="label">NetVerse Labs</p>
+        <h1 class="brand__name">Net<em>Verse</em></h1>
+      </div>
+    </div>
+
+    <p class="tagline">Lab simulator jaringan ISP & data center — jalan di VPS sendiri, buka dari HP maupun desktop.</p>
+
+    <div class="status-strip">
+      <span class="chip"><span class="dot dot--live" aria-hidden="true"></span>1 project live</span>
+      <span class="mono">1-core vps · self-hosted</span>
+    </div>
+  </div>
+</header>
+
+<main id="katalog" class="catalog">
+  <section class="wrap" aria-labelledby="katalog-judul">
+    <div class="section-head">
+      <h2 id="katalog-judul">Katalog Proyek</h2>
+      <p class="mono">05 entri · 01 live · 02 segera</p>
+    </div>
+
+    <ol class="grid">
+      <li class="card card--feature">
+        <div class="card__top">
+          <span class="badge badge--live"><span class="dot dot--live" aria-hidden="true"></span>Live</span>
+          <span class="mono card__idx">01</span>
+        </div>
+        <h3 class="card__title">NetVerse ISP Simulator</h3>
+        <p class="card__desc">Simulasi ruang server 3D plus NOC: rak MikroTik, kabel patch, gameplay perawatan, monitor NOC live, dan audio ambience.</p>
+        <p class="accent">Port 8081 · HTTP</p>
+        <div class="card__foot">
+          <a class="btn btn--primary" href="http://45.149.187.194:8081" target="_blank" rel="noopener noreferrer" aria-label="Buka NetVerse ISP Simulator di tab baru, port 8081">
+            Buka Simulator
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8"></path>
+            </svg>
+          </a>
+        </div>
+      </li>
+
+      <li class="card">
+        <div class="card__top">
+          <span class="badge badge--open">Open</span>
+          <span class="mono card__idx">02</span>
+        </div>
+        <h3 class="card__title">Kode Sumber (GitHub)</h3>
+        <p class="card__desc">Seluruh kode simulator beserta riwayat pengembangan.</p>
+        <p class="accent">GitHub · abidulikhsan-rgb</p>
+        <div class="card__foot">
+          <a class="btn btn--ghost" href="https://github.com/abidulikhsan-rgb/netverse-isp-simulator" target="_blank" rel="noopener noreferrer" aria-label="Buka repositori kode sumber NetVerse di GitHub, tab baru">
+            Buka GitHub
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8"></path>
+            </svg>
+          </a>
+        </div>
+      </li>
+
+      <li class="card">
+        <div class="card__top">
+          <span class="badge badge--private">Private</span>
+          <span class="mono card__idx">03</span>
+        </div>
+        <h3 class="card__title">Server Console (ttyd)</h3>
+        <p class="card__desc">Terminal Linux asli di VPS via HTTPS, diakses dengan login.</p>
+        <p class="accent">Port 8443 · TLS</p>
+        <div class="card__foot">
+          <a class="btn btn--ghost" href="https://45.149.187.194:8443/ttyd/" target="_blank" rel="noopener noreferrer" aria-label="Buka Server Console ttyd di tab baru, port 8443">
+            Buka Terminal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17L17 7M9 7h8v8"></path>
+            </svg>
+          </a>
+        </div>
+      </li>
+
+      <li class="card card--soon">
+        <div class="card__top">
+          <span class="badge badge--soon">Soon</span>
+          <span class="mono card__idx">04</span>
+        </div>
+        <h3 class="card__title">NetVerse Server Simulator</h3>
+        <p class="card__desc">Modul simulasi manajemen server dan fisik rack.</p>
+        <p class="accent accent--muted">Modul · belum rilis</p>
+      </li>
+
+      <li class="card card--soon">
+        <div class="card__top">
+          <span class="badge badge--soon">Soon</span>
+          <span class="mono card__idx">05</span>
+        </div>
+        <h3 class="card__title">NetVerse Database Simulator</h3>
+        <p class="card__desc">Modul simulasi database dan storage.</p>
+        <p class="accent accent--muted">Modul · belum rilis</p>
+      </li>
+    </ol>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap site-foot__inner">
+    <p>© 2026 NetVerse Labs · Dibangun dengan Hermes + OpenCode · VPS 1-core, bukan cloud besar.</p>
+  </div>
+</footer>
+</body>
+</html>
