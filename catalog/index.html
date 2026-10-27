@@ -4,255 +4,207 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0d0906">
-<meta name="description" content="Portofolio Abidul Ikhsan (Ikhnova) — Network Simulation & Infrastructure Developer. Membangun simulator jaringan ISP, data center 3D, dan tooling infrastructure.">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="description" content="Portofolio Abidul Ikhsan (Ikhnova) — Network Simulation & Infrastructure Developer. Pembangun NetVerse ISP Simulator, data center 3D, dan tooling infrastruktur.">
 <title>Abidul Ikhsan (Ikhnova) — Network Simulation & Infrastructure Developer</title>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16x16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
 <style>
 :root{
-  --bg:#0d0906;
-  --panel:#141010;
-  --panel-hi:#1a1210;
-  --line:rgba(245,240,234,.10);
-  --line-2:rgba(245,240,234,.20);
-  --text:#f5f0ea;
-  --dim:#9a8f85;
+  --bg:#0A0A0A;
+  --bg-warm:#0d0906;
+  --bay:#151515;
+  --line:rgba(255,255,255,.10);
+  --line-2:rgba(255,255,255,.20);
+  --text:#F2EEE9;
+  --dim:#8C837B;
   --accent:#ff5c00;
-  --accent-soft:rgba(255,92,0,.12);
-  --radius:14px;
+  --accent-soft:color-mix(in srgb,var(--accent) 14%,transparent);
+  --accent-line:color-mix(in srgb,var(--accent) 45%,transparent);
+  --r:18px;
   --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
-  margin:0;min-height:100vh;color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.65;
-  -webkit-font-smoothing:antialiased;
-  background-color:var(--bg);
-  background-image:
-    radial-gradient(820px 460px at 80% -8%,rgba(255,92,0,.17),transparent 62%),
-    radial-gradient(680px 560px at 4% 26%,rgba(255,92,0,.08),transparent 66%),
-    radial-gradient(900px 620px at 52% 104%,rgba(255,92,0,.07),transparent 70%);
-  background-repeat:no-repeat;background-attachment:fixed;
+  margin:0;min-height:100vh;overflow-x:hidden;color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;background-color:var(--bg);background-image:linear-gradient(180deg,var(--bg-warm),transparent 38%);
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(880px 520px at 88% -12%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 62%),
+    radial-gradient(720px 540px at -10% 38%,color-mix(in srgb,var(--accent) 9%,transparent),transparent 66%),
+    radial-gradient(900px 600px at 48% 106%,rgba(255,255,255,.05),transparent 72%);
 }
 body::after{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.028;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctums='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(130% 90% at 50% 0%,#000 18%,transparent 78%);
+  mask-image:radial-gradient(130% 90% at 50% 0%,#000 18%,transparent 78%);
 }
-[hidden]{display:none!important}
+img,svg{display:block}
 a{color:inherit}
 button{font:inherit}
-svg{display:block}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
 .wrap{width:min(1180px,100%);margin-inline:auto;padding-inline:20px;position:relative;z-index:1}
-section[id]{scroll-margin-top:76px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
-.skip{position:fixed;z-index:120;top:10px;left:10px;padding:10px 14px;transform:translateY(-180%);background:var(--accent);color:#160c05;font-weight:700;border-radius:8px}
+.section{padding-block:30px}
+.skip{position:fixed;z-index:120;top:10px;left:10px;padding:10px 14px;transform:translateY(-180%);background:var(--accent);color:var(--bg);font-weight:700;border-radius:8px;text-decoration:none}
 .skip:focus{transform:none}
 
-
-.preloader{position:fixed;inset:0;z-index:100;display:grid;place-content:center;justify-items:center;gap:18px;background:#0d0906;animation:preload .45s ease both}
-.preloader-ring{position:relative;width:104px;height:104px}
-.preloader-ring svg{width:104px;height:104px;animation:spin 1.15s linear infinite}
-.ring-track{fill:none;stroke:rgba(245,240,234,.10);stroke-width:2}
-.ring-arc{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-dasharray:82 245}
-.preloader-mark{position:absolute;inset:0;display:grid;place-items:center;font-size:26px;font-weight:800;letter-spacing:-.04em;color:var(--text)}
-.preloader-text{font-family:var(--mono);font-size:10px;letter-spacing:.28em;color:var(--dim);margin:0}
-
-.site-header{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(13,9,6,.80);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.header-inner{display:flex;min-height:60px;align-items:center;justify-content:space-between;gap:14px}
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.logo-symbol{width:28px;height:28px;flex:none;filter:drop-shadow(0 0 9px rgba(255,92,0,.45))}
-.wordmark{font-weight:800;letter-spacing:.18em;line-height:1;white-space:nowrap}
-.logo .wordmark{font-size:13px}
+.site-header{position:sticky;top:0;z-index:60;border-bottom:1px solid var(--line);background:rgba(10,10,10,.74);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.bar{display:flex;min-height:64px;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.brand-mark{width:30px;height:30px;border-radius:8px}
+.wordmark{font-size:14px;font-weight:800;letter-spacing:.2em;line-height:1;white-space:nowrap}
 .wordmark .ikh{color:var(--text)}
 .wordmark .nova{color:var(--accent)}
-.nav{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(13,9,6,.97);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .2s ease,transform .2s ease,visibility .2s}
+.wordmark--lg{font-size:clamp(1.45rem,4.4vw,1.9rem);letter-spacing:.16em}
+.nav{
+  position:fixed;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  background:rgba(10,10,10,.97);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .2s ease,transform .2s ease,visibility .2s;
+}
 .nav.open{opacity:1;visibility:visible;transform:none}
-.nav-link{display:inline-flex;min-height:46px;align-items:center;padding:8px 14px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:var(--dim)}
-.nav-link:hover{color:var(--accent)}
-.nav-link--jasa{padding:8px 11px;border:1px solid rgba(255,92,0,.35);border-radius:999px;font-size:11px;letter-spacing:.12em;color:var(--accent)}
-.burger{display:grid;gap:5px;width:44px;height:44px;place-content:center;border:1px solid var(--line-2);border-radius:10px;background:rgba(255,255,255,.03);cursor:pointer}
+.nav-link{padding:10px 16px;font-size:15px;font-weight:600;text-decoration:none;color:var(--dim);transition:color .2s ease}
+.nav-link:hover{color:var(--text)}
+.nav-link--ghost{padding:8px 14px;border:1px solid var(--line);border-radius:999px;font-size:13px}
+.burger{display:grid;gap:5px;width:42px;height:42px;place-content:center;border:1px solid var(--line-2);border-radius:12px;background:rgba(255,255,255,.03);cursor:pointer}
 .burger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:transform .2s ease,opacity .2s ease}
 .burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .burger[aria-expanded="true"] span:nth-child(2){opacity:0}
 .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 body.nav-open{overflow:hidden}
 
-.sec{padding-block:68px;border-bottom:1px solid var(--line)}
-.sec-label{display:flex;align-items:center;gap:12px;margin:0 0 14px;font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
-.sec-label::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--accent),transparent);flex:none}
-.sec-title{margin:0;font-size:clamp(2rem,6.2vw,3.4rem);font-weight:800;letter-spacing:-.035em;line-height:1;font-stretch:expanded}
-.sec-title--accent{color:var(--accent)}
-.sec-sub{max-width:640px;margin:16px 0 0;color:var(--dim);font-size:15px}
+.bento{display:grid;gap:14px}
+.card{
+  position:relative;padding:24px;border:1px solid var(--line);border-radius:var(--r);
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  transition:transform .2s ease,border-color .2s ease,background-color .2s ease;
+}
+.card:hover{transform:scale(1.02);border-color:var(--line-2)}
+.card-lit::before{content:"";position:absolute;inset:-1px -1px auto;height:1px;border-radius:var(--r) var(--r) 0 0;background:linear-gradient(90deg,var(--accent),transparent 62%)}
+.h2{margin:0;font-size:clamp(1.35rem,3.4vw,1.9rem);font-weight:800;letter-spacing:-.03em;line-height:1.12}
+.lede{margin:16px 0 0;color:var(--dim);font-size:clamp(15px,1.4vw,16px);max-width:62ch}
+.cap{margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
 
-.hero{padding-block:48px 62px;border-bottom:1px solid var(--line)}
-.hero-grid{display:grid;gap:34px;align-items:center}
-.portrait{position:relative}
-.portrait-frame{position:relative;overflow:hidden;padding:14px;border:1px solid rgba(255,92,0,.28);border-radius:var(--radius);
-  background:linear-gradient(160deg,rgba(255,92,0,.14),rgba(255,92,0,.02) 55%),#100b08;
-  box-shadow:0 0 0 1px rgba(255,92,0,.16),0 0 44px -6px rgba(255,92,0,.62),0 0 110px -20px rgba(255,60,0,.55),0 30px 70px -34px rgba(0,0,0,.95),inset 0 0 70px rgba(255,92,0,.10)}
-.portrait-art{position:relative;display:grid;place-items:center;aspect-ratio:4/5;border-radius:10px;overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 8%,rgba(255,92,0,.34),transparent 62%),linear-gradient(180deg,#1b100b,#0b0705)}
-.portrait-art::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,92,0,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(255,92,0,.10) 1px,transparent 1px);background-size:26px 26px;opacity:.55}
-.portrait-art::after{content:"";position:absolute;inset:12% 12% auto;height:52%;border-radius:50%;border:1px solid rgba(255,92,0,.28);box-shadow:0 0 40px rgba(255,92,0,.25) inset}
-.logo-card{border-radius:24px;background:#141010}
-.logo-art{aspect-ratio:1/1;padding:30px 22px 66px;gap:20px;background:radial-gradient(120% 90% at 50% 10%,rgba(255,92,0,.26),transparent 62%),#141010}
-.logo-art::after{inset:21%;height:58%;border-radius:50%}
-.nova-symbol{width:min(120px,72%);height:auto;aspect-ratio:1/1;filter:drop-shadow(0 0 26px rgba(255,92,0,.45))}
-.logo-lockup{margin:0;font-size:clamp(1.45rem,5.6vw,2.1rem);text-align:center}
-.portrait-badge{position:absolute;z-index:2;left:24px;right:24px;bottom:24px;padding:11px 14px;border:1px solid rgba(255,92,0,.40);border-radius:10px;background:rgba(13,9,6,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
-.kicker{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
-.hero-name{margin:10px 0 0;font-size:clamp(2.6rem,10.5vw,6.2rem);font-weight:800;letter-spacing:-.045em;line-height:.9;font-stretch:expanded;color:var(--accent);text-shadow:0 0 60px rgba(255,92,0,.35)}
-.hero-alias{margin:10px 0 0;font-family:var(--mono);font-size:13px;letter-spacing:.16em;color:var(--dim)}
-.hero-role{margin:20px 0 0;font-size:clamp(1.05rem,3.6vw,1.5rem);font-weight:700;letter-spacing:-.02em;color:var(--text);min-height:1.6em}
-.typewriter-cursor{display:inline-block;margin-left:2px;color:var(--accent);animation:typewriter-blink 1s linear infinite}
-.socials{display:flex;gap:10px;margin:22px 0 0}
-.social{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line-2);border-radius:12px;color:var(--dim);transition:color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-.social:hover{color:var(--accent);border-color:rgba(255,92,0,.55);box-shadow:0 0 22px -8px rgba(255,92,0,.9);transform:translateY(-2px)}
-.social svg{width:19px;height:19px}
-.btn{display:inline-flex;min-height:48px;align-items:center;justify-content:center;gap:9px;padding:12px 20px;border:1px solid var(--line-2);border-radius:12px;background:rgba(255,255,255,.03);color:var(--text);font-size:14px;font-weight:700;letter-spacing:.01em;text-decoration:none;cursor:pointer;transition:border-color .18s ease,background-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
-.btn svg{width:17px;height:17px;flex:none}
-.btn--primary{border-color:var(--accent);background:var(--accent);color:#160c05;box-shadow:0 0 34px -12px rgba(255,92,0,1)}
-.btn--primary:hover{border-color:#ff7a2b;background:#ff7a2b;color:#160c05;box-shadow:0 0 40px -10px rgba(255,92,0,1)}
-.btn--outline:hover{border-color:rgba(255,92,0,.6);color:var(--accent);background:var(--accent-soft)}
-.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
-.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;min-height:46px;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border:1px solid var(--line-2);border-radius:12px;background:rgba(255,255,255,.04);color:var(--text);font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;transition:transform .2s ease,border-color .2s ease,background-color .2s ease,color .2s ease}
+.btn:hover{border-color:var(--accent-line);background:var(--accent-soft);transform:translateY(-1px)}
+.btn--primary{border-color:transparent;background:var(--accent);color:var(--bg)}
+.btn--primary:hover{background:color-mix(in srgb,var(--accent) 86%,#fff);color:var(--bg)}
+.btn--sm{min-height:38px;padding:8px 14px;border-radius:10px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-.about-grid{display:grid;gap:22px;margin-top:26px}
-.about-copy{margin:0;color:var(--dim);font-size:clamp(1rem,2.4vw,1.08rem);line-height:1.8}
-.about-copy strong{color:var(--text);font-weight:700}
+.hero{padding-block:26px 18px}
+.hero-card{grid-column:span 12}
+.role{margin:0;font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--dim)}
+.name{margin:16px 0 0;font-size:clamp(2.7rem,11.5vw,6.2rem);font-weight:800;letter-spacing:-.05em;line-height:.88}
+.alias{margin:12px 0 0;font-family:var(--mono);font-size:13px;letter-spacing:.16em;color:var(--accent)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.specs{display:grid;gap:14px;margin:30px 0 0;padding-top:22px;border-top:1px solid var(--line)}
+.specs dt{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.specs dd{margin:6px 0 0;font-size:14px}
+.panel-card{grid-column:span 12;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.bay{width:min(232px,74%);padding:12px;border:1px solid var(--line);border-radius:16px;background:var(--bay);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 30px 60px -42px #000}
+.bay img{width:100%;height:auto;border-radius:10px}
+.bay::after{content:"";display:block;height:1px;margin-top:12px;background:linear-gradient(90deg,transparent,var(--accent-line),transparent)}
 
-.sec-label--accent{color:var(--accent)}
-.name-grid{display:grid;gap:14px;margin-top:26px}
-.name-card{padding:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
-.name-card h3{margin:0;font-size:1.35rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
-.name-card p{margin:10px 0 0;color:var(--dim);font-size:14px;line-height:1.7}
-.name-note{margin:20px 0 0;color:var(--dim);font-size:14px;font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0;padding:0;list-style:none}
+.chip{padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);font-family:var(--mono);font-size:12px;color:var(--dim);transition:border-color .2s ease,color .2s ease}
+.chip:hover{border-color:var(--accent-line);color:var(--text)}
+.notes{margin:22px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.notes li{padding-left:16px;border-left:2px solid var(--accent-line);color:var(--dim);font-size:14px}
+.notes b{color:var(--text);font-weight:700;letter-spacing:.04em}
 
-
-.chips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 0;padding:0;list-style:none}
-.chip{padding:9px 15px;border:1px solid var(--line);border-radius:999px;background:#141010;color:#d8cec4;font-family:var(--mono);font-size:12px;letter-spacing:.05em;transition:border-color .18s ease,color .18s ease,box-shadow .18s ease}
-.chip:hover{border-color:rgba(255,92,0,.55);color:#ffd7bd;box-shadow:0 0 24px -10px rgba(255,92,0,.95)}
-
-.service-grid{display:grid;gap:14px;margin:28px 0 0;padding:0;list-style:none}
-.service{display:flex;flex-direction:column;padding:22px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease,background-color .2s ease}
-.service:hover{transform:translateY(-4px);border-color:rgba(255,92,0,.42);background:var(--panel-hi);box-shadow:0 0 40px -14px rgba(255,92,0,.95)}
-.service-icon{display:grid;place-items:center;width:46px;height:46px;border:1px solid rgba(255,92,0,.30);border-radius:12px;background:var(--accent-soft);color:var(--accent)}
-.service-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.service h3{margin:16px 0 0;font-size:1.08rem;font-weight:800;letter-spacing:-.02em;line-height:1.25}
-.service p{margin:8px 0 0;color:var(--dim);font-size:14px;line-height:1.65}
-
-.flagship{position:relative;overflow:hidden;margin-top:28px;padding:24px;border:1px solid rgba(255,92,0,.30);border-radius:var(--radius);
-  background:linear-gradient(145deg,rgba(255,92,0,.10),transparent 42%),var(--panel);box-shadow:0 30px 90px -60px rgba(255,92,0,.95)}
-.flagship::before{content:"";position:absolute;inset:0 0 auto;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
-.card-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border:1px solid var(--line-2);border-radius:999px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.badge--live{border-color:rgba(255,92,0,.45);background:var(--accent-soft);color:#ffb07a}
-.badge--soon{border-style:dashed;color:var(--dim)}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2.4s ease-out infinite}
-.technical{margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.flagship h3{margin:20px 0 0;font-size:clamp(1.7rem,5.4vw,3rem);font-weight:800;letter-spacing:-.04em;line-height:1.02;font-stretch:expanded}
-.flagship-desc{max-width:680px;margin:14px 0 0;color:var(--dim);font-size:15px;line-height:1.75}
-.feature-list{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:8px}
-.feature-list li{position:relative;padding-left:20px;color:#cfc4ba;font-size:14px}
-.feature-list li::before{content:"";position:absolute;left:0;top:.62em;width:9px;height:2px;background:var(--accent)}
-.flagship-actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
-.gate{margin-top:22px;padding:16px;border:1px solid var(--line);border-radius:12px;background:rgba(6,4,3,.55)}
-.gate-steps{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.project{grid-column:span 12;display:grid;gap:24px}
+.project-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:5px 11px;border:1px solid var(--accent-line);border-radius:999px;background:var(--accent-soft);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.tech{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--dim)}
+.features{margin:20px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.features li{position:relative;padding-left:18px;color:var(--dim);font-size:14px}
+.features li::before{content:"";position:absolute;left:0;top:.68em;width:8px;height:2px;background:var(--accent)}
+.project-side{display:grid;gap:14px;align-content:start}
+.console{position:relative;overflow:hidden;padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--bay)}
+.console::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.06) 50%,transparent 62%);transform:translateX(-100%);animation:sweep 7s linear infinite}
+.ports{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;width:min(250px,100%);margin-inline:auto}
+.ports i{display:block;aspect-ratio:1;border:1px solid var(--line);border-radius:4px;background:rgba(255,255,255,.05)}
+.ports i.on{border-color:var(--accent);background:var(--accent);box-shadow:0 0 14px -3px var(--accent)}
+.console .cap{margin-top:16px;text-align:center}
+.gate{padding:18px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.025)}
+.gate-steps{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 .gate-steps span:nth-child(2){color:var(--accent)}
 .gate-actions{display:flex;flex-wrap:wrap;gap:10px}
-.gate-unlock[aria-disabled="true"]{opacity:.45;pointer-events:none}
-.gate-note{margin:12px 0 0;font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--dim)}
-.gate-status{min-height:1.5em;margin:10px 0 0;font-size:12px;color:#ffb07a}
-.project-grid{display:grid;gap:14px;margin:16px 0 0;padding:0;list-style:none}
-.project-card{display:flex;min-height:180px;flex-direction:column;padding:20px;border:1px dashed var(--line);border-radius:var(--radius);background:#100b09}
-.project-card--soon{background:#0f0a08}
-.project-card h3{margin:18px 0 0;font-size:1.05rem;font-weight:700;letter-spacing:-.02em;color:#a1968c}
-.project-card p{margin:8px 0 0;color:var(--dim);font-size:14px}
-.sub-label{margin:38px 0 0;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.gate-status{margin:14px 0 0;font-size:13px;color:var(--text)}
+.gate-note{margin:10px 0 0;font-family:var(--mono);font-size:10px;line-height:1.7;color:var(--dim)}
 
-.contact-grid{display:grid;gap:14px;margin:28px 0 0}
-.contact-card{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);text-decoration:none;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
-.contact-card:hover{border-color:rgba(255,92,0,.45);box-shadow:0 0 34px -16px rgba(255,92,0,.95);transform:translateY(-3px)}
-.contact-card small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.contact-card strong{display:block;margin-top:5px;font-size:1.05rem;font-weight:700}
-.contact-card svg{width:22px;height:22px;flex:none;color:var(--accent)}
-.contact-card .contact-note{display:block;margin-top:6px;color:var(--dim);font-size:13px;line-height:1.55}
+.tile{grid-column:span 12;display:flex;align-items:center;justify-content:space-between;gap:18px;text-decoration:none}
+.tile-label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.tile-value{display:block;margin-top:6px;font-size:1.02rem;font-weight:700;letter-spacing:-.01em}
+.tile svg{width:20px;height:20px;flex:none;color:var(--accent);transition:transform .2s ease}
+.tile:hover svg{transform:translate(2px,-2px)}
 
-.closing{padding-block:72px 56px;border-bottom:1px solid var(--line)}
-.closing-inner{display:grid;gap:34px}
-.closing-title{margin:0;font-size:clamp(2.5rem,9.4vw,7rem);font-weight:800;letter-spacing:-.045em;line-height:.92;font-stretch:expanded}
-.closing-title span{display:block}
-.closing-title .accent{color:var(--accent);text-shadow:0 0 70px rgba(255,92,0,.35)}
-.closing-nav{display:grid;gap:4px;align-content:start;padding-top:6px}
-.closing-nav a{padding:7px 0;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);text-decoration:none}
-.closing-nav a:hover{color:var(--accent)}
-.closing-contact{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
-.closing-contact a{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--dim);text-decoration:none;transition:color .18s ease,border-color .18s ease}
-.closing-contact a:hover{color:var(--accent);border-color:rgba(255,92,0,.55)}
-.closing-contact svg{width:15px;height:15px}
-.site-footer{padding-block:24px;color:var(--dim);font-size:12px}
-.site-footer p{margin:0}
+.site-footer{margin-top:34px;border-top:1px solid var(--line);padding-block:24px;color:var(--dim);font-size:13px}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.foot p{margin:0}
+.foot-links{display:flex;flex-wrap:wrap;gap:16px}
+.foot-links a{color:var(--dim);text-decoration:none;transition:color .2s ease}
+.foot-links a:hover{color:var(--accent)}
 
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes preload{from{opacity:0}to{opacity:1}}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,92,0,.65)}72%{box-shadow:0 0 0 8px rgba(255,92,0,0)}100%{box-shadow:0 0 0 0 rgba(255,92,0,0)}}
-@keyframes typewriter-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes sweep{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-@media (min-width:620px){
+@media (min-width:520px){
   .wrap{padding-inline:28px}
-  .hero{padding-block:64px 76px}
-  .flagship{padding:32px}
-  .name-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .closing-inner{grid-template-columns:minmax(0,1fr) 190px}
+  .specs{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (min-width:880px){
-  .nav{position:static;flex-direction:row;opacity:1;visibility:visible;transform:none;background:none;gap:2px}
+  .nav{position:static;flex-direction:row;align-items:center;gap:6px;background:none;opacity:1;visibility:visible;transform:none}
+  .nav-link{padding:8px 12px;font-size:14px}
+  .nav-link--ghost{padding:7px 13px;font-size:12px}
   .burger{display:none}
-  .hero-grid{grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:52px}
-  .service-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .about-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:38px}
-  .project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .section{padding-block:38px}
+  .hero{padding-block:44px 24px}
+  .tile{grid-column:span 6}
+}
+@media (min-width:900px){
+  .bento{grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
+  .hero-card{grid-column:span 8}
+  .panel-card{grid-column:span 4}
+  .stack-card{grid-column:span 7}
+  .about-card{grid-column:span 5}
+  .project{grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:34px}
 }
 @media (max-width:419px){
-  .hero-actions,.flagship-actions,.gate-actions{flex-direction:column;align-items:stretch}
-  .hero-actions .btn,.flagship-actions .btn,.flagship-actions a,.gate-actions .btn,.gate-actions a{width:100%}
+  .actions{flex-direction:column;align-items:stretch}
+  .actions .btn,.gate-actions .btn{width:100%}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-  .preloader{display:none!important}
-  .typewriter-cursor{animation:none!important;opacity:1}
 }
 </style>
 </head>
 <body>
-<div class="preloader" id="preloader" aria-hidden="true">
-  <div class="preloader-ring">
-    <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="52"/><circle class="ring-arc" cx="60" cy="60" r="52"/></svg>
-    <span class="preloader-mark">AI</span>
-  </div>
-  <p class="preloader-text">LOADING</p>
-</div>
 <a class="skip" href="#main">Lewati ke konten</a>
 
 <header class="site-header">
-  <div class="wrap header-inner">
-    <a class="logo" href="#home" aria-label="Abidul Ikhsan — Ikhnova, kembali ke home">
-      <img class="logo-symbol" src="assets/logo-ikhnova.webp" alt="" aria-hidden="true">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="Ikhnova, kembali ke atas">
+      <img class="brand-mark" src="assets/logo-ikhnova.webp" alt="" aria-hidden="true" width="30" height="30">
       <span class="wordmark"><span class="ikh">IKH</span><span class="nova">NOVA</span></span>
     </a>
     <nav class="nav" id="primary-nav" aria-label="Navigasi utama">
-      <a class="nav-link" href="#home">Home</a>
-      <a class="nav-link" href="#about">About</a>
-      <a class="nav-link" href="#skills">Skills</a>
-      <a class="nav-link" href="#services">Services</a>
-      <a class="nav-link" href="#projects">Projects</a>
-      <a class="nav-link" href="#contact">Contact</a>
-      <a class="nav-link nav-link--jasa" href="https://ikhnova.my.id/jasa/" target="_blank" rel="noopener" aria-label="Jasa UMKM di ikhnova.my.id/jasa">Jasa UMKM</a>
+      <a class="nav-link" href="#tentang">Tentang</a>
+      <a class="nav-link" href="#proyek">Proyek</a>
+      <a class="nav-link" href="#kontak">Kontak</a>
+      <a class="nav-link nav-link--ghost" href="https://ikhnova.my.id/jasa/" target="_blank" rel="noopener">Jasa UMKM</a>
+      <a class="btn btn--primary btn--sm" href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener">NetVerse</a>
     </nav>
     <button class="burger" id="nav-toggle" type="button" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
       <span></span><span></span><span></span>
@@ -261,279 +213,170 @@ body.nav-open{overflow:hidden}
 </header>
 
 <main id="main">
-  <section class="hero" id="home" aria-labelledby="hero-title">
-    <div class="wrap hero-grid">
-      <div class="portrait">
-        <div class="portrait-frame logo-card">
-          <div class="portrait-art logo-art">
-            <img class="nova-symbol" src="assets/logo-ikhnova.webp" alt="" aria-hidden="true">
-            <p class="wordmark logo-lockup"><span class="ikh">IKH</span><span class="nova">NOVA</span></p>
-          </div>
-          <p class="portrait-badge">Network & Systems Developer</p>
+  <section class="hero wrap" id="top">
+    <div class="bento">
+      <article class="card hero-card card-lit">
+        <p class="role">Network Simulation & Infrastructure Developer</p>
+        <h1 class="name">Abidul Ikhsan</h1>
+        <p class="alias">Ikhnova</p>
+        <p class="lede">Saya membangun simulator jaringan dan infrastruktur yang benar-benar jalan: susun topologi, patching rak, sampai deployment di VPS beserta monitoringnya.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener">Buka NetVerse</a>
+          <a class="btn" href="https://ikhnova.my.id">Portofolio</a>
         </div>
-      </div>
-      <div class="hero-copy">
-        <p class="kicker">Hi I am</p>
-        <h1 class="hero-name" id="hero-title">Abidul Ikhsan</h1>
-        <p class="hero-alias">(Ikhnova)</p>
-        <p class="hero-role">Network Simulation & Infrastructure Developer</p>
-        <div class="socials">
-          <a class="social" href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener" aria-label="GitHub Abidul Ikhsan">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58l-.01-2.05c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22l-.01 3.29c0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5Z"/></svg>
-          </a>
-          <a class="social" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener" aria-label="Instagram @_.ikhxann.ab">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>
-          </a>
-        </div>
-        <div class="hero-actions">
-          <a class="btn btn--primary" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener" aria-label="Hire Me melalui Instagram @_.ikhxann.ab">
-            Hire Me
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <a class="btn btn--outline" href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener" aria-label="Source Code di GitHub">
-            Source Code
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" id="name" aria-labelledby="name-title">
-    <div class="wrap">
-      <p class="sec-label sec-label--accent">— THE NAME</p>
-      <h2 class="sec-title" id="name-title">IKHNOVA</h2>
-      <div class="name-grid">
-        <article class="name-card">
-          <h3>IKH</h3>
-          <p>Dari nama Abidul Ikhsan. Identitas yang melekat pada setiap karya.</p>
-        </article>
-        <article class="name-card">
-          <h3>NOVA</h3>
-          <p>Bintang yang tiba-tiba menyala terang. Dibangun diam-diam, bersinar saat siap.</p>
-        </article>
-      </div>
-      <p class="name-note">Empat titik pada logo adalah node jaringan; ledakan di tengahnya adalah momen ketika semuanya terhubung.</p>
-    </div>
-  </section>
-
-  <section class="sec" id="about" aria-labelledby="about-title">
-    <div class="wrap">
-      <p class="sec-label">About</p>
-      <h2 class="sec-title sec-title--accent" id="about-title">About Me</h2>
-      <div class="about-grid">
-        <p class="about-copy">Saya membangun <strong>simulator jaringan dan data center</strong> untuk memberi ruang belajar yang realistis. Perangkat, topologi, kabel, dan alur troubleshooting harus terasa seperti pekerjaan NOC, bukan sekadar visual yang enak dilihat.</p>
-        <p class="about-copy">Saya merancang dan membangun sistem yang benar-benar jalan: simulator jaringan, infrastruktur server, dan tooling-nya — dari desain, kode, sampai deploy.</p>
-        <p class="about-copy">Workflow development saya AI-assisted: Hermes mengarahkan proses, OpenCode menulis dan memverifikasi kode, supaya hasil akhirnya tetap jujur, ringkas, dan benar-benar bisa diuji.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" id="skills" aria-labelledby="skills-title">
-    <div class="wrap">
-      <p class="sec-label">Skills</p>
-      <h2 class="sec-title" id="skills-title">Tools & Technologies</h2>
-      <p class="sec-sub">Fondasi teknis untuk membangun, menjalankan, menguji simulasi jaringan yang lebih realistis.</p>
-      <ul class="chips" aria-label="Daftar kemampuan teknis">
-        <li class="chip">MikroTik Networking</li>
-        <li class="chip">Linux & VPS</li>
-        <li class="chip">React + TypeScript</li>
-        <li class="chip">Three.js + WebGL</li>
-        <li class="chip">Web Audio API</li>
-        <li class="chip">Docker</li>
-        <li class="chip">Nginx</li>
-        <li class="chip">Git</li>
-        <li class="chip">AI-assisted Development</li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="sec" id="services" aria-labelledby="services-title">
-    <div class="wrap">
-      <p class="sec-label">Services</p>
-      <h2 class="sec-title" id="services-title">What I Build</h2>
-      <p class="sec-sub">Dari model jaringan hingga antarmuka operasional, setiap layanan dirancang untuk dipakai, bukan hanya dipamerkan.</p>
-      <div class="service-grid">
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg></div>
-          <h3>Network Simulation</h3>
-          <p>Simulasi topologi, perangkat, kabel, dan alur troubleshooting untuk latihan jaringan yang lebih realistis.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></div>
-          <h3>3D & WebGL</h3>
-          <p>Ruang virtual interaktif dengan Three.js, pencahayaan, dan kontrol yang tetap ringan di perangkat.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 9-3 3 3 3m8-6 3 3-3 3m-3-8-2 10"/></svg></div>
-          <h3>Full-Stack Web</h3>
-          <p>Aplikasi web responsif dengan React, TypeScript, API, dan arsitektur yang mudah dirawat.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/></svg></div>
-          <h3>Infrastructure & VPS</h3>
-          <p>Deployment, hardening, reverse proxy, dan otomasi server agar aplikasi tetap stabil serta hemat sumber daya.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h2l2-7 4 14 3-12 3 9 2-4h2"/></svg></div>
-          <h3>Audio Systems</h3>
-          <p>Web Audio untuk ambience, feedback, dan soundscape prosedural yang mengikuti interaksi pengguna.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M8 6h4a4 4 0 0 1 4 4v0M8 18h4a4 4 0 0 0 4-4v0M10 6v12"/></svg></div>
-          <h3>Automation & AI Workflow</h3>
-          <p>Alur kerja AI-assisted yang memisahkan arahan, implementasi, dan verifikasi agar perubahan tetap terukur.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></svg></div>
-          <h3>CLI & Tooling</h3>
-          <p>Perintah terminal, script kecil, dan developer tooling yang mempercepat pekerjaan berulang secara aman.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4M7 12l3-3 2 2 4-4"/></svg></div>
-          <h3>Monitoring & NOC</h3>
-          <p>Dashboard uptime, log, dan status perangkat untuk membantu kondisi sistem selalu terlihat.</p>
-        </article>
-        <article class="service service-card">
-          <div class="service-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19 7-7 3 3-7 7-4 1 1-4Zm10-4-3-3M12 19l-2 2"/></svg></div>
-          <h3>UI/UX Industrial</h3>
-          <p>Antarmuka padat, jelas, dan bergaya industrial dengan fokus pada aksesibilitas serta alur kerja teknis.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="sec" id="projects" aria-labelledby="projects-title">
-    <div class="wrap">
-      <p class="sec-label">Projects</p>
-      <h2 class="sec-title" id="projects-title">Selected Work</h2>
-      <p class="sec-sub">Eksperimen yang berjalan sebagai sistem, bukan hanya mockup visual.</p>
-
-      <article class="flagship" aria-labelledby="netverse-title">
-        <div class="card-top">
-          <span class="badge badge--live"><span class="live-dot" aria-hidden="true"></span>Live</span>
-          <p class="technical">netverse.ikhnova.my.id · WEBGL</p>
-        </div>
-        <h3 id="netverse-title">NetVerse ISP Simulator</h3>
-        <p class="flagship-desc">Ruang kerja ISP 3D untuk memahami perangkat, penempatan rack, dan alur operasional jaringan secara interaktif. Simulator ini berfokus pada realisme detail perangkat dan status link, bukan sekadar visual dekoratif.</p>
-        <ul class="feature-list" aria-label="Fitur utama NetVerse ISP Simulator">
-          <li>Rak MikroTik 3D dengan patch cord yang dapat ditelusuri.</li>
-          <li>Mode maintenance untuk membuka rack, mengganti kabel, dan menukar perangkat.</li>
-          <li>NOC room dengan dashboard monitoring, video wall, dan ambience audio prosedural.</li>
-          <li>Performa perangkat, status jaringan, serta interaksi teknis yang tertata.</li>
-        </ul>
-        <div class="flagship-actions">
-          <button class="btn btn--primary" id="simulator-locked" type="button" disabled>Buka Simulator</button>
-          <a class="btn btn--primary" id="simulator-open" href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener" hidden>Buka Simulator</a>
-          <a class="btn btn--outline" href="https://github.com/abidulikhsan-rgb/netverse-isp-simulator" target="_blank" rel="noopener" aria-label="Lihat source code NetVerse ISP Simulator di GitHub">
-            Source Code
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-          </a>
-        </div>
-
-        <div class="gate" id="access-gate">
-          <p class="gate-steps"><span>1 · Follow</span><span aria-hidden="true">→</span><span>2 · Buka</span></p>
-          <div class="gate-actions">
-            <a class="btn btn--outline" id="follow-instagram" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener" aria-label="Follow Instagram @_.ikhxann.ab">Follow @_.ikhxann.ab</a>
-            <a class="btn btn--outline gate-unlock" id="gate-unlock" href="#" data-gate-unlock>Saya sudah follow</a>
-          </div>
-          <p class="gate-status" id="gate-status" role="status" aria-live="polite">Akses simulator masih terkunci.</p>
-          <p class="gate-note">Ikuti @_.ikhxann.ab lalu kembali ke sini untuk membuka akses. Verifikasi follow dilakukan secara sukarela.</p>
-        </div>
+        <dl class="specs">
+          <div><dt>Fokus</dt><dd>Simulator jaringan, data center 3D, tooling</dd></div>
+          <div><dt>Lokasi</dt><dd>Pasuruan, Indonesia</dd></div>
+          <div><dt>Kanal</dt><dd>Instagram & GitHub</dd></div>
+        </dl>
       </article>
 
-      <p class="sub-label">Next in the lab</p>
-      <div class="project-grid">
-        <article class="project-card project-card--soon">
-          <span class="badge badge--soon">Soon</span>
-          <h3>NetVerse Server Simulator</h3>
-          <p>Simulasi server dengan konfigurasi, service, dan monitoring yang sedang dikembangkan.</p>
-        </article>
-        <article class="project-card project-card--soon">
-          <span class="badge badge--soon">Soon</span>
-          <h3>NetVerse Database Simulator</h3>
-          <p>Simulasi database untuk memvisualisasikan skema, query, dan hubungan data secara interaktif.</p>
-        </article>
-      </div>
+      <article class="card panel-card">
+        <div class="bay">
+          <img src="assets/logo-ikhnova.webp" alt="Logo Patch Panel Ikhnova" width="512" height="512">
+        </div>
+        <p class="wordmark wordmark--lg"><span class="ikh">IKH</span><span class="nova">NOVA</span></p>
+        <p class="cap">Patch panel · 6 × 6</p>
+      </article>
     </div>
   </section>
 
-  <section class="sec" id="contact" aria-labelledby="contact-title">
-    <div class="wrap">
-      <p class="sec-label">Contact</p>
-      <h2 class="sec-title" id="contact-title">Let's Connect</h2>
-      <p class="sec-sub">Punya ide, kebutuhan infrastruktur, atau ingin berdiskusi tentang simulator jaringan? Pilih kanal yang paling nyaman.</p>
-      <div class="contact-grid">
-        <a class="contact-card" href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener" aria-label="GitHub Abidul Ikhsan">
-          <span><small>GitHub</small><strong>abidulikhsan-rgb</strong></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </a>
-        <a class="contact-card" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener" aria-label="Instagram @_.ikhxann.ab">
-          <span><small>Instagram</small><strong>@_.ikhxann.ab</strong></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".7" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a class="contact-card" href="https://ikhnova.my.id/jasa/" target="_blank" rel="noopener" aria-label="Jasa UMKM — pembuatan website, katalog online, dan QRIS">
-          <span><small>Jasa UMKM</small><strong>Website, Katalog &amp; QRIS</strong><span class="contact-note">Pembuatan website, katalog online &amp; QRIS untuk usaha kecil di Pasuruan.</span></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10 6.5 5h11L19 10"/><path d="M4 10h16v9H4z"/><path d="M9.5 19v-5h5v5"/></svg>
-        </a>
-      </div>
-    </div>
+  <section class="section wrap" id="tentang">
+    <div class="bento">
+      <article class="card stack-card">
+        <h2 class="h2">Stack yang dipakai harian</h2>
+        <ul class="chips" aria-label="Teknologi yang digunakan">
+          <li class="chip">MikroTik</li>
+          <li class="chip">RouterOS</li>
+          <li class="chip">Linux</li>
+          <li class="chip">Docker</li>
+          <li class="chip">Nginx</li>
+          <li class="chip">VPS</li>
+          <li class="chip">React</li>
+          <li class="chip">TypeScript</li>
+          <li class="chip">Three.js</li>
+          <li class="chip">WebGL</li>
+          <li class="chip">Web Audio API</li>
+          <li class="chip">Git</li>
+        </ul>
+        <ul class="notes">
+          <li><b>IKH</b> — diambil dari nama Abidul Ikhsan.</li>
+          <li><b>NOVA</b> — bintang yang tiba-tiba terang. Dibangun diam-diam, menyala saat siap.</li>
+        </ul>
+      </article>
 
-    <div class="wrap closing">
-      <p class="sec-label">— THE LAST FRAME</p>
-      <div class="closing-inner">
-        <h2 class="closing-title" id="closing-title"><span>LET'S BUILD</span><span>SOMETHING THAT</span><span class="accent">MATTERS.</span></h2>
-        <nav class="closing-nav" aria-label="Navigasi penutup">
-          <a href="#home">Home</a>
-          <a href="#about">About</a>
-          <a href="#skills">Skills</a>
-          <a href="#services">Services</a>
-          <a href="#projects">Projects</a>
-          <a href="#contact">Contact</a>
-        </nav>
-      </div>
-      <div class="closing-contact">
-        <a href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener" aria-label="GitHub Abidul Ikhsan">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58l-.01-2.05c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.11-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.65 1.65.24 2.87.12 3.17.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.82 1.1.82 2.22l-.01 3.29c0 .32.22.7.83.58C20.57 22.29 24 17.79 24 12.5 24 5.87 18.63.5 12 .5Z"/></svg>
-          GitHub
-        </a>
-        <a href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener" aria-label="Instagram @_.ikhxann.ab">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".7" fill="currentColor" stroke="none"/></svg>
-          Instagram
-        </a>
-      </div>
+      <article class="card about-card">
+        <h2 class="h2">Tentang saya</h2>
+        <p class="lede">Kerja saya ada di dua sisi: simulator jaringan untuk latihan dan NOC, serta infrastruktur server yang menjalankan semuanya. Keduanya saya perlakukan seperti pekerjaan nyata — perangkat, port, kabel, dan status link harus masuk akal.</p>
+        <p class="lede">Mulai dari merancang topologi, menulis kodenya, sampai deploying, hardening, dan memantau uptime. Kalau belum bisa dites di server sungguhan, belum selesai.</p>
+        <p class="lede">Selain itu: web full-stack, Web Audio untuk ambience, dan otomasi CLI untuk pekerjaan berulang.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section wrap" id="proyek">
+    <div class="bento">
+      <article class="card project card-lit">
+        <div class="project-main">
+          <div class="project-head">
+            <span class="badge"><span class="dot" aria-hidden="true"></span>Live</span>
+            <p class="tech">netverse.ikhnova.my.id</p>
+          </div>
+          <h2 class="h2">NetVerse ISP Simulator</h2>
+          <p class="lede">Ruang kerja ISP 3D untuk memahami perangkat, penempatan rak, dan alur operasional jaringan secara interaktif. Detail perangkat dan status link dibuat supaya terasa seperti NOC, bukan visual dekoratif.</p>
+          <ul class="features" aria-label="Fitur utama NetVerse ISP Simulator">
+            <li>Rak MikroTik 3D dengan patch cord yang bisa ditelusuri.</li>
+            <li>Mode maintenance: buka rak, ganti kabel, tukar perangkat.</li>
+            <li>NOC room dengan dashboard monitoring, video wall, dan ambience audio prosedural.</li>
+            <li>Performa perangkat dan status jaringan ditampilkan realtime.</li>
+          </ul>
+          <div class="actions">
+            <button class="btn btn--primary" id="simulator-locked" type="button" disabled>Buka Simulator</button>
+            <a class="btn btn--primary" id="simulator-open" href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener" hidden>Buka Simulator</a>
+            <a class="btn" href="https://github.com/abidulikhsan-rgb/netverse-isp-simulator" target="_blank" rel="noopener">Source code</a>
+          </div>
+        </div>
+
+        <aside class="project-side">
+          <div class="console">
+            <div class="ports" aria-hidden="true">
+              <i class="on"></i><i></i><i></i><i></i><i></i><i class="on"></i>
+              <i class="on"></i><i class="on"></i><i></i><i></i><i></i><i class="on"></i>
+              <i class="on"></i><i></i><i class="on"></i><i></i><i></i><i class="on"></i>
+              <i class="on"></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i>
+              <i class="on"></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i>
+              <i class="on"></i><i></i><i></i><i></i><i></i><i class="on"></i>
+            </div>
+            <p class="cap">Rack A · patch panel</p>
+          </div>
+
+          <div class="gate" id="access-gate">
+            <p class="gate-steps"><span>1 · Ikuti</span><span aria-hidden="true">→</span><span>2 · Buka</span></p>
+            <div class="gate-actions">
+              <a class="btn btn--sm" id="follow-instagram" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener">Ikuti @_.ikhxann.ab</a>
+              <a class="btn btn--sm" id="gate-unlock" href="#" data-gate-unlock>Saya sudah follow</a>
+            </div>
+            <p class="gate-status" id="gate-status" role="status" aria-live="polite">Akses simulator masih terkunci.</p>
+            <p class="gate-note">Ikuti dulu, lalu kembali ke sini. Verifikasi follow dilakukan secara sukarela dan tidak ada data yang dikirim ke server.</p>
+          </div>
+        </aside>
+      </article>
+    </div>
+  </section>
+
+  <section class="section wrap" id="kontak">
+    <div class="bento">
+      <a class="card tile" href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener">
+        <span><span class="tile-label">GitHub</span><span class="tile-value">abidulikhsan-rgb</span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </a>
+      <a class="card tile" href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener">
+        <span><span class="tile-label">Instagram</span><span class="tile-value">@_.ikhxann.ab</span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="card tile" href="https://ikhnova.my.id">
+        <span><span class="tile-label">Portofolio</span><span class="tile-value">ikhnova.my.id</span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9Z"/></svg>
+      </a>
+      <a class="card tile" href="https://ikhnova.my.id/jasa/" target="_blank" rel="noopener">
+        <span><span class="tile-label">Jasa UMKM</span><span class="tile-value">Website, katalog & QRIS</span></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10 6.5 5h11L19 10"/><path d="M4 10h16v9H4z"/><path d="M9.5 19v-5h5v5"/></svg>
+      </a>
     </div>
   </section>
 </main>
+
 <footer class="site-footer">
-  <div class="wrap"><p>© 2026 Abidul Ikhsan · ikhnova.my.id · Built with Hermes + OpenCode</p></div>
+  <div class="wrap foot">
+    <p>© 2026 Abidul Ikhsan — Ikhnova</p>
+    <p class="foot-links">
+      <a href="https://ikhnova.my.id">ikhnova.my.id</a>
+      <a href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener">netverse.ikhnova.my.id</a>
+      <a href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener">github</a>
+      <a href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener">instagram</a>
+    </p>
+  </div>
 </footer>
+
 <script>
-const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,preloader=document.getElementById('preloader');
-const roleEl=document.querySelector('.hero-role'),roleText=roleEl.textContent.trim();
-function typewriter(){
-  if(reduced){roleEl.textContent=roleText;return}
-  const cursor=document.createElement('span');
-  cursor.className='typewriter-cursor';
-  cursor.textContent='|';
-  cursor.setAttribute('aria-hidden','true');
-  roleEl.textContent='';
-  roleEl.append(cursor);
-  let i=0;
-  const typeChar=()=>{
-    if(i<roleText.length){roleEl.insertBefore(document.createTextNode(roleText[i++]),cursor);setTimeout(typeChar,40)}
-  };
-  typeChar();
-}
-if(reduced){preloader.remove();typewriter()}
-else{preloader.style.transition='opacity .35s';setTimeout(()=>{roleEl.textContent='';preloader.style.opacity='0';setTimeout(()=>{preloader.remove();typewriter()},400)},900)}
-const toggle=document.getElementById('nav-toggle'),nav=document.getElementById('primary-nav'),setNav=open=>{nav.classList.toggle('open',open);toggle.setAttribute('aria-expanded',open);document.body.classList.toggle('nav-open',open)};
-toggle.onclick=()=>setNav(!nav.classList.contains('open'));
-nav.onclick=e=>{if(e.target.closest('a'))setNav(false)};
-const openGate=()=>{const open=document.getElementById('simulator-open');document.getElementById('simulator-locked')?.replaceWith(open);open.hidden=false;document.querySelector('.gate-steps').hidden=true;document.getElementById('gate-status').textContent='akses terbuka'};
+const toggle=document.getElementById('nav-toggle'),nav=document.getElementById('primary-nav');
+const setNav=open=>{nav.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open));document.body.classList.toggle('nav-open',open)};
+toggle.addEventListener('click',()=>setNav(!nav.classList.contains('open')));
+nav.addEventListener('click',e=>{if(e.target.closest('a'))setNav(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setNav(false)});
+
+const openGate=()=>{
+  const open=document.getElementById('simulator-open'),locked=document.getElementById('simulator-locked');
+  if(locked)locked.replaceWith(open);
+  open.hidden=false;
+  const steps=document.querySelector('.gate-steps');
+  if(steps)steps.hidden=true;
+  const status=document.getElementById('gate-status');
+  if(status)status.textContent='Akses terbuka — simulator bisa dibuka.';
+};
 const unlock=document.getElementById('gate-unlock');
-try{if(localStorage.getItem('ab-ig-unlocked')==='1')openGate()}catch{}
-unlock.onclick=e=>{e.preventDefault();try{localStorage.setItem('ab-ig-unlocked','1')}catch{}openGate()};
+try{if(localStorage.getItem('ab-ig-unlocked')==='1')openGate()}catch(e){}
+unlock.addEventListener('click',e=>{e.preventDefault();try{localStorage.setItem('ab-ig-unlocked','1')}catch(e){}openGate()});
 </script>
 </body>
 </html>
