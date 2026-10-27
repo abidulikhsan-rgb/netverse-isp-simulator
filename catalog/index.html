@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0d0906">
 <meta name="description" content="Portofolio Abidul Ikhsan (Ikhnova) — Network Simulation & Infrastructure Developer. Membangun simulator jaringan ISP, data center 3D, dan tooling infrastructure.">
 <title>Abidul Ikhsan (Ikhnova) — Network Simulation & Infrastructure Developer</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23ff5c00'/%3E%3Ctext x='16' y='22' font-family='Arial,Helvetica,sans-serif' font-size='15' font-weight='700' text-anchor='middle' fill='%230d0906'%3EAI%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%23ff5c00' stroke-linecap='round'%3E%3Cpath d='M120 30v56M120 154v56M30 120h56M154 120h56' stroke-width='18'/%3E%3Cpath d='M55 55l28 28M185 55l-28 28M55 185l28-28M185 185l-28-28' stroke-width='13'/%3E%3C/g%3E%3Ccircle cx='120' cy='120' r='40' stroke='%23ff5c00' stroke-opacity='.3' stroke-width='5'/%3E%3Ccircle cx='120' cy='120' r='27' fill='%23ff5c00'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#0d0906;
@@ -61,8 +61,11 @@ section[id]{scroll-margin-top:76px}
 .site-header{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(13,9,6,.80);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .header-inner{display:flex;min-height:60px;align-items:center;justify-content:space-between;gap:14px}
 .logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
-.logo-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--accent);color:#160c05;font-size:14px;font-weight:800;letter-spacing:-.03em;box-shadow:0 0 24px -6px rgba(255,92,0,.9)}
-.logo-text{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--dim)}
+.logo-symbol{width:28px;height:28px;flex:none;filter:drop-shadow(0 0 9px rgba(255,92,0,.45))}
+.wordmark{font-weight:800;letter-spacing:.18em;line-height:1;white-space:nowrap}
+.logo .wordmark{font-size:13px}
+.wordmark .ikh{color:var(--text)}
+.wordmark .nova{color:var(--accent)}
 .nav{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(13,9,6,.97);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .2s ease,transform .2s ease,visibility .2s}
 .nav.open{opacity:1;visibility:visible;transform:none}
 .nav-link{display:inline-flex;min-height:46px;align-items:center;padding:8px 14px;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:var(--dim)}
@@ -91,7 +94,11 @@ body.nav-open{overflow:hidden}
   background:radial-gradient(120% 90% at 50% 8%,rgba(255,92,0,.34),transparent 62%),linear-gradient(180deg,#1b100b,#0b0705)}
 .portrait-art::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,92,0,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(255,92,0,.10) 1px,transparent 1px);background-size:26px 26px;opacity:.55}
 .portrait-art::after{content:"";position:absolute;inset:12% 12% auto;height:52%;border-radius:50%;border:1px solid rgba(255,92,0,.28);box-shadow:0 0 40px rgba(255,92,0,.25) inset}
-.monogram{position:relative;z-index:1;font-size:clamp(4.2rem,19vw,8rem);font-weight:800;letter-spacing:-.06em;line-height:1;font-stretch:expanded;color:#fff3ea;text-shadow:0 0 38px rgba(255,92,0,.75),0 0 90px rgba(255,92,0,.45)}
+.logo-card{border-radius:24px;background:#141010}
+.logo-art{aspect-ratio:1/1;padding:30px 22px 66px;gap:20px;background:radial-gradient(120% 90% at 50% 10%,rgba(255,92,0,.26),transparent 62%),#141010}
+.logo-art::after{inset:21%;height:58%;border-radius:50%}
+.nova-symbol{width:min(120px,72%);height:auto;aspect-ratio:1/1;filter:drop-shadow(0 0 26px rgba(255,92,0,.45))}
+.logo-lockup{margin:0;font-size:clamp(1.45rem,5.6vw,2.1rem);text-align:center}
 .portrait-badge{position:absolute;z-index:2;left:24px;right:24px;bottom:24px;padding:11px 14px;border:1px solid rgba(255,92,0,.40);border-radius:10px;background:rgba(13,9,6,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text)}
 .kicker{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
 .hero-name{margin:10px 0 0;font-size:clamp(2.6rem,10.5vw,6.2rem);font-weight:800;letter-spacing:-.045em;line-height:.9;font-stretch:expanded;color:var(--accent);text-shadow:0 0 60px rgba(255,92,0,.35)}
@@ -113,7 +120,13 @@ body.nav-open{overflow:hidden}
 .about-grid{display:grid;gap:22px;margin-top:26px}
 .about-copy{margin:0;color:var(--dim);font-size:clamp(1rem,2.4vw,1.08rem);line-height:1.8}
 .about-copy strong{color:var(--text);font-weight:700}
-.about-accent{margin-top:24px}
+
+.sec-label--accent{color:var(--accent)}
+.name-grid{display:grid;gap:14px;margin-top:26px}
+.name-card{padding:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.name-card h3{margin:0;font-size:1.35rem;font-weight:800;letter-spacing:.16em;color:var(--accent)}
+.name-card p{margin:10px 0 0;color:var(--dim);font-size:14px;line-height:1.7}
+.name-note{margin:20px 0 0;color:var(--dim);font-size:14px;font-style:italic}
 
 
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 0;padding:0;list-style:none}
@@ -188,6 +201,7 @@ body.nav-open{overflow:hidden}
   .wrap{padding-inline:28px}
   .hero{padding-block:64px 76px}
   .flagship{padding:32px}
+  .name-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .closing-inner{grid-template-columns:minmax(0,1fr) 190px}
 }
@@ -224,8 +238,8 @@ body.nav-open{overflow:hidden}
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="logo" href="#home" aria-label="Abidul Ikhsan — Ikhnova, kembali ke home">
-      <span class="logo-mark" aria-hidden="true">AI</span>
-      <span class="logo-text">IKHNOVA</span>
+      <svg class="logo-symbol" viewBox="0 0 240 240" aria-hidden="true"><defs><linearGradient id="novaNav" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff5c00"/></linearGradient></defs><g stroke="url(#novaNav)" stroke-linecap="round" fill="none"><path d="M120 30v56M120 154v56M30 120h56M154 120h56" stroke-width="18"/><path d="M55 55l28 28M185 55l-28 28M55 185l28-28M185 185l-28-28" stroke-width="13"/></g><circle cx="120" cy="120" r="40" stroke="#ff5c00" stroke-opacity=".3" stroke-width="5" fill="none"/><circle cx="120" cy="120" r="27" fill="url(#novaNav)"/><g fill="#ffc98a"><circle cx="120" cy="18" r="7"/><circle cx="120" cy="222" r="7"/><circle cx="18" cy="120" r="7"/><circle cx="222" cy="120" r="7"/></g></svg>
+      <span class="wordmark"><span class="ikh">IKH</span><span class="nova">NOVA</span></span>
     </a>
     <nav class="nav" id="primary-nav" aria-label="Navigasi utama">
       <a class="nav-link" href="#home">Home</a>
@@ -245,9 +259,10 @@ body.nav-open{overflow:hidden}
   <section class="hero" id="home" aria-labelledby="hero-title">
     <div class="wrap hero-grid">
       <div class="portrait">
-        <div class="portrait-frame">
-          <div class="portrait-art">
-            <span class="monogram" aria-hidden="true">AI</span>
+        <div class="portrait-frame logo-card">
+          <div class="portrait-art logo-art">
+            <svg class="nova-symbol" viewBox="0 0 240 240" aria-hidden="true"><defs><linearGradient id="novaHero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff5c00"/></linearGradient></defs><g stroke="url(#novaHero)" stroke-linecap="round" fill="none"><path d="M120 30v56M120 154v56M30 120h56M154 120h56" stroke-width="18"/><path d="M55 55l28 28M185 55l-28 28M55 185l28-28M185 185l-28-28" stroke-width="13"/></g><circle cx="120" cy="120" r="40" stroke="#ff5c00" stroke-opacity=".3" stroke-width="5" fill="none"/><circle cx="120" cy="120" r="27" fill="url(#novaHero)"/><g fill="#ffc98a"><circle cx="120" cy="18" r="7"/><circle cx="120" cy="222" r="7"/><circle cx="18" cy="120" r="7"/><circle cx="222" cy="120" r="7"/></g></svg>
+            <p class="wordmark logo-lockup"><span class="ikh">IKH</span><span class="nova">NOVA</span></p>
           </div>
           <p class="portrait-badge">Network & Systems Developer</p>
         </div>
@@ -279,15 +294,33 @@ body.nav-open{overflow:hidden}
     </div>
   </section>
 
+  <section class="sec" id="name" aria-labelledby="name-title">
+    <div class="wrap">
+      <p class="sec-label sec-label--accent">— THE NAME</p>
+      <h2 class="sec-title" id="name-title">IKHNOVA</h2>
+      <div class="name-grid">
+        <article class="name-card">
+          <h3>IKH</h3>
+          <p>Dari nama Abidul Ikhsan. Identitas yang melekat pada setiap karya.</p>
+        </article>
+        <article class="name-card">
+          <h3>NOVA</h3>
+          <p>Bintang yang tiba-tiba menyala terang. Dibangun diam-diam, bersinar saat siap.</p>
+        </article>
+      </div>
+      <p class="name-note">Empat titik pada logo adalah node jaringan; ledakan di tengahnya adalah momen ketika semuanya terhubung.</p>
+    </div>
+  </section>
+
   <section class="sec" id="about" aria-labelledby="about-title">
     <div class="wrap">
       <p class="sec-label">About</p>
       <h2 class="sec-title sec-title--accent" id="about-title">About Me</h2>
       <div class="about-grid">
         <p class="about-copy">Saya membangun <strong>simulator jaringan dan data center</strong> untuk memberi ruang belajar yang realistis. Perangkat, topologi, kabel, dan alur troubleshooting harus terasa seperti pekerjaan NOC, bukan sekadar visual yang enak dilihat.</p>
-        <p class="about-copy">Semua proyek inti saya berjalan di atas <strong>satu VPS 1-core</strong> dengan sumber daya terbatas. Workflow development saya AI-assisted: Hermes mengarahkan proses, OpenCode menulis dan memverifikasi kode, supaya hasil akhirnya tetap jujur, ringkas, dan benar-benar bisa diuji.</p>
+        <p class="about-copy">Saya merancang dan membangun sistem yang benar-benar jalan: simulator jaringan, infrastruktur server, dan tooling-nya — dari desain, kode, sampai deploy.</p>
+        <p class="about-copy">Workflow development saya AI-assisted: Hermes mengarahkan proses, OpenCode menulis dan memverifikasi kode, supaya hasil akhirnya tetap jujur, ringkas, dan benar-benar bisa diuji.</p>
       </div>
-      <p class="technical about-accent">1 VPS · 1 core · 1 domain</p>
     </div>
   </section>
 
