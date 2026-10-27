@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0906">
+<meta name="description" content="Jasa website UMKM Pasuruan: buat website, katalog online, QRIS, dan aplikasi kasir. Harga jelas, dikerjakan sampai beres.">
+<title>Jasa Pembuatan Website & Setup QRIS untuk UMKM Pasuruan — ikhnova</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%23ff5c00' stroke-linecap='round'%3E%3Cpath d='M120 30v56M120 154v56M30 120h56M154 120h56' stroke-width='18'/%3E%3Cpath d='M55 55l28 28M185 55l-28 28M55 185l28-28M185 185l-28-28' stroke-width='13'/%3E%3C/g%3E%3Ccircle cx='120' cy='120' r='40' stroke='%23ff5c00' stroke-opacity='.3' stroke-width='5'/%3E%3Ccircle cx='120' cy='120' r='27' fill='%23ff5c00'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0d0906;--panel:#141010;--panel-hi:#1a1210;
+  --line:rgba(245,240,234,.10);--line-2:rgba(245,240,234,.20);
+  --text:#f5f0ea;--dim:#9a8f85;--accent:#ff5c00;--accent-soft:rgba(255,92,0,.12);
+  --radius:16px;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:var(--sans);font-size:17px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;background-color:var(--bg);
+  background-image:
+    radial-gradient(820px 460px at 80% -8%,rgba(255,92,0,.17),transparent 62%),
+    radial-gradient(680px 560px at 4% 26%,rgba(255,92,0,.08),transparent 66%),
+    radial-gradient(900px 620px at 52% 104%,rgba(255,92,0,.07),transparent 70%);
+  background-repeat:no-repeat;background-attachment:fixed;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.028;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+a{color:inherit}
+svg{display:block}
+.wrap{width:min(1080px,100%);margin-inline:auto;padding-inline:18px;position:relative;z-index:1}
+section[id]{scroll-margin-top:88px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+.skip{position:fixed;z-index:120;top:10px;left:10px;padding:12px 16px;transform:translateY(-180%);background:var(--accent);color:#160c05;font-weight:700;border-radius:10px}
+.skip:focus{transform:none}
+
+.topbar{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);background:rgba(13,9,6,.88);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.topbar-inner{display:flex;min-height:66px;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.logo-symbol{width:30px;height:30px;flex:none;filter:drop-shadow(0 0 9px rgba(255,92,0,.45))}
+.wordmark{font-size:14px;font-weight:800;letter-spacing:.18em;line-height:1;white-space:nowrap}
+.wordmark .ikh{color:var(--text)}
+.wordmark .nova{color:var(--accent)}
+.nav-link{display:inline-flex;min-height:52px;align-items:center;padding:0 18px;border:1px solid var(--line-2);border-radius:999px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .18s ease,border-color .18s ease}
+.nav-link:hover{color:var(--accent);border-color:rgba(255,92,0,.55)}
+
+.hero{padding-block:44px 56px}
+.sec-label{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.sec-label::before{content:"";width:28px;height:1px;background:linear-gradient(90deg,var(--accent),transparent);flex:none}
+.hero-title{margin:0;font-size:clamp(2.3rem,9vw,4.3rem);font-weight:800;letter-spacing:-.035em;line-height:1.02;text-wrap:balance}
+.hero-sub{margin:20px 0 0;max-width:640px;font-size:clamp(1.05rem,3.7vw,1.22rem);color:var(--dim)}
+.hero-actions{display:flex;flex-direction:column;gap:14px;margin-top:30px}
+
+.btn{display:inline-flex;min-height:56px;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border:1px solid var(--line-2);border-radius:14px;background:rgba(255,255,255,.03);color:var(--text);font-size:16px;font-weight:700;line-height:1.25;text-align:center;text-decoration:none;cursor:pointer;transition:border-color .18s ease,background-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease}
+.btn svg{width:20px;height:20px;flex:none}
+.btn--primary{border-color:var(--accent);background:var(--accent);color:#160c05;box-shadow:0 0 40px -12px rgba(255,92,0,1)}
+.btn--primary:hover{border-color:#ff7a2b;background:#ff7a2b;color:#160c05;box-shadow:0 0 46px -10px rgba(255,92,0,1)}
+.btn--outline:hover{border-color:rgba(255,92,0,.6);color:var(--accent);background:var(--accent-soft)}
+.btn--lg{min-height:60px;font-size:17px;padding-inline:30px}
+
+.sec{padding-block:56px;border-bottom:1px solid var(--line)}
+.sec-title{margin:0;font-size:clamp(1.9rem,7vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;text-wrap:balance}
+.sec-sub{margin:14px 0 0;max-width:620px;color:var(--dim);font-size:16px}
+.grid-3{display:grid;gap:16px;margin-top:28px}
+.card{padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.card h3{margin:0;font-size:1.15rem;font-weight:800;letter-spacing:-.01em;line-height:1.3}
+.card p{margin:10px 0 0;color:var(--dim);font-size:16px}
+.closing-line{margin:30px 0 0;font-size:clamp(1.35rem,5.4vw,2.1rem);font-weight:800;letter-spacing:-.02em;line-height:1.22;color:var(--accent);text-shadow:0 0 44px rgba(255,92,0,.35)}
+
+.price-grid{display:grid;gap:18px;margin-top:30px}
+.price-card{display:flex;flex-direction:column;padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.price-card--best{border-color:rgba(255,92,0,.55);background:linear-gradient(160deg,rgba(255,92,0,.12),transparent 48%),var(--panel);box-shadow:0 0 70px -26px rgba(255,92,0,.95)}
+.tag{display:inline-flex;align-self:flex-start;padding:7px 13px;border:1px solid rgba(255,92,0,.5);border-radius:999px;background:var(--accent-soft);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.18em;color:#ffb07a}
+.price-card h3{margin:16px 0 0;font-size:1.08rem;font-weight:800;line-height:1.3}
+.price{margin:10px 0 0;font-size:clamp(1.8rem,7.6vw,2.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;color:var(--accent)}
+.price-note{margin:6px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.feat{margin:18px 0 0;padding:0;list-style:none;display:grid;gap:10px}
+.feat li{position:relative;padding-left:26px;color:#d7ccc2;font-size:15.5px;line-height:1.6}
+.feat li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:2px;background:var(--accent)}
+.price-card .btn{margin-top:24px;width:100%}
+.extra{display:grid;gap:12px;margin-top:24px}
+.extra-item{margin:0;padding:20px 22px;border:1px dashed var(--line-2);border-radius:14px;background:rgba(255,255,255,.02);color:#d7ccc2;font-size:16px}
+.extra-item strong{color:var(--text)}
+.note{margin:26px 0 0;padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:rgba(6,4,3,.5);color:var(--dim);font-size:14.5px;line-height:1.75}
+
+.steps{display:grid;gap:16px;margin:28px 0 0;padding:0;list-style:none}
+.step{padding:26px 24px 24px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.step-no{display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,92,0,.45);border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-size:22px;font-weight:800}
+.step h3{margin:16px 0 0;font-size:1.2rem;font-weight:800;letter-spacing:-.01em}
+.step p{margin:8px 0 0;color:var(--dim);font-size:16px}
+
+.work{margin-top:26px;padding:26px;border:1px solid rgba(255,92,0,.3);border-radius:var(--radius);background:linear-gradient(150deg,rgba(255,92,0,.1),transparent 46%),var(--panel)}
+.work p{margin:0;color:var(--dim);font-size:16.5px}
+.work p strong{color:var(--text)}
+.work-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.work-actions .btn{flex:1 1 220px}
+
+.faq{display:grid;gap:12px;margin-top:26px}
+.faq-item{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:62px;padding:18px 20px;font-size:1.05rem;font-weight:700;cursor:pointer;list-style:none}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-icon{width:22px;height:22px;flex:none;color:var(--accent);transition:transform .2s ease}
+.faq-item[open] .faq-icon{transform:rotate(180deg)}
+.faq-item p{margin:0;padding:0 20px 20px;color:var(--dim);font-size:16px}
+
+.closing{padding-block:64px 52px;text-align:center}
+.closing .sec-label{justify-content:center}
+.closing-title{margin:0;font-size:clamp(2rem,8vw,3.6rem);font-weight:800;letter-spacing:-.035em;line-height:1.08;text-wrap:balance}
+.closing .btn{margin-top:30px;width:100%}
+.site-footer{padding-block:26px 120px;border-top:1px solid var(--line);color:var(--dim);font-size:13.5px;text-align:center}
+.site-footer p{margin:0}
+
+.wa-float{position:fixed;right:16px;bottom:16px;z-index:60;display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--accent);color:#160c05;box-shadow:0 0 40px -8px rgba(255,92,0,.95),0 14px 30px -12px rgba(0,0,0,.85);transition:transform .18s ease,background-color .18s ease}
+.wa-float:hover{transform:translateY(-3px);background:#ff7a2b}
+.wa-float svg{width:34px;height:34px}
+
+@media (min-width:680px){
+  .wrap{padding-inline:26px}
+  .hero-actions{flex-direction:row;flex-wrap:wrap}
+  .hero-actions .btn{width:auto}
+  .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .price-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .closing .btn{width:auto}
+  .site-footer{padding-bottom:44px}
+}
+@media (min-width:900px){
+  .steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width:419px){
+  .work-actions .btn{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Langsung ke isi halaman</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="waIcon" viewBox="0 0 24 24"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.75-.87-2.02-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.25-.46-2.38-1.48-.88-.78-1.48-1.76-1.65-2.05-.17-.3-.02-.46.13-.6.13-.14.29-.35.44-.53.15-.17.2-.3.29-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.48-.5-.66-.51h-.57c-.2 0-.52.07-.79.37-.27.3-.83 1.01-1.04 2.48 0 1.46 1.06 2.87 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.05 21.8a9.9 9.9 0 0 1-5.04-1.38l-.36-.22-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.43-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.9 6.99c0 5.45-4.44 9.89-9.89 9.89M20.46 3.49A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.9c0 2.09.55 4.14 1.59 5.94L0 24l6.3-1.65a11.88 11.88 0 0 0 5.68 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.49-8.4"/></symbol></svg>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="logo" href="/" aria-label="ikhnova — Portofolio Abidul Ikhsan">
+      <svg class="logo-symbol" viewBox="0 0 240 240" aria-hidden="true"><defs><linearGradient id="novaJasa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb35c"/><stop offset="1" stop-color="#ff5c00"/></linearGradient></defs><g stroke="url(#novaJasa)" stroke-linecap="round" fill="none"><path d="M120 30v56M120 154v56M30 120h56M154 120h56" stroke-width="18"/><path d="M55 55l28 28M185 55l-28 28M55 185l28-28M185 185l-28-28" stroke-width="13"/></g><circle cx="120" cy="120" r="40" stroke="#ff5c00" stroke-opacity=".3" stroke-width="5" fill="none"/><circle cx="120" cy="120" r="27" fill="url(#novaJasa)"/><g fill="#ffc98a"><circle cx="120" cy="18" r="7"/><circle cx="120" cy="222" r="7"/><circle cx="18" cy="120" r="7"/><circle cx="222" cy="120" r="7"/></g></svg>
+      <span class="wordmark"><span class="ikh">IKH</span><span class="nova">NOVA</span></span>
+    </a>
+    <a class="nav-link" href="/">Portofolio</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <p class="sec-label">Jasa Web & Digital untuk UMKM</p>
+      <h1 class="hero-title" id="hero-title">Usahamu Layak Ditemukan Pelanggan.</h1>
+      <p class="hero-sub">Saya bantu usaha kecil di Pasuruan punya website, katalog online, QRIS, dan aplikasi kasir — biar pelanggan gampang menemukan, memesan, dan membayar. Semua dikerjakan sampai beres, kamu terima jadi.</p>
+      <div class="hero-actions">
+        <a class="btn btn--primary" href="#" data-wa aria-label="Chat WhatsApp — konsultasi gratis"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp — Konsultasi Gratis</a>
+        <a class="btn btn--outline" href="#harga">Lihat Harga</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="masalah" aria-labelledby="masalah-title">
+    <div class="wrap">
+      <p class="sec-label">Masalah &#8594; Solusi</p>
+      <h2 class="sec-title" id="masalah-title">Kenapa Usahamu Belum Ramai?</h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Tidak muncul di Google</h3>
+          <p>Pelanggan cari di HP, yang muncul kompetitor.</p>
+        </article>
+        <article class="card">
+          <h3>Pesan masih manual</h3>
+          <p>Chat bolak-balik tanya harga & stok itu melelahkan.</p>
+        </article>
+        <article class="card">
+          <h3>Belum bisa QRIS & pencatatan berantakan</h3>
+          <p>Pembayaran tunai saja + catatan buku bikin rekap pendapatan susah.</p>
+        </article>
+      </div>
+      <p class="closing-line">Semua itu bisa dibereskan sekaligus, mulai Rp150 ribu.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="harga" aria-labelledby="harga-title">
+    <div class="wrap">
+      <p class="sec-label">Layanan & Harga</p>
+      <h2 class="sec-title" id="harga-title">Pilih yang Paling Cocok</h2>
+      <p class="sec-sub">Harga jelas, sekali bayar, tidak ada biaya tersembunyi.</p>
+      <div class="price-grid">
+        <article class="price-card">
+          <h3>Setup QRIS & Kasir Digital</h3>
+          <p class="price">Rp150.000</p>
+          <p class="price-note">Sekali bayar</p>
+          <ul class="feat">
+            <li>Pendaftaran QRIS dibantu sampai aktif atas nama usaha.</li>
+            <li>Pemasangan aplikasi kasir (install & setting).</li>
+            <li>Input sampai 30 produk/menu awal.</li>
+            <li>Pelatihan 1 sesi sampai bisa sendiri.</li>
+            <li>Uang pembayaran masuk langsung ke rekening/e-wallet pemilik usaha.</li>
+          </ul>
+          <a class="btn btn--outline" href="#" data-wa aria-label="Chat WhatsApp untuk paket Setup QRIS dan Kasir Digital"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp</a>
+        </article>
+
+        <article class="price-card">
+          <h3>Paket Katalog Online</h3>
+          <p class="price">Rp499.000</p>
+          <ul class="feat">
+            <li>Website 1 halaman.</li>
+            <li>Profil usaha + katalog produk/menu berfoto.</li>
+            <li>Tombol “Pesan via WhatsApp” per produk.</li>
+            <li>Alamat + peta Google Maps, jam buka.</li>
+            <li>Cocok untuk warung, toko, dan jasa.</li>
+          </ul>
+          <a class="btn btn--outline" href="#" data-wa aria-label="Chat WhatsApp untuk Paket Katalog Online"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp</a>
+        </article>
+
+        <article class="price-card price-card--best">
+          <span class="tag">PALING COCOK</span>
+          <h3>Paket Web Usaha</h3>
+          <p class="price">Rp999.000</p>
+          <ul class="feat">
+            <li>Sampai 5 halaman: Beranda, Tentang, Produk/Layanan, Galeri, Kontak.</li>
+            <li>Semua isi Paket Katalog Online.</li>
+            <li>Dibantu daftarkan Profil Bisnis Google (muncul di Google Maps).</li>
+            <li>Pengaturan dasar agar mudah ditemukan di pencarian Google.</li>
+          </ul>
+          <a class="btn btn--primary" href="#" data-wa aria-label="Chat WhatsApp untuk Paket Web Usaha"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp</a>
+        </article>
+
+        <article class="price-card">
+          <h3>Paket Naik Kelas (Web + Kasir)</h3>
+          <p class="price">Rp1.499.000</p>
+          <ul class="feat">
+            <li>Semua isi Paket Web Usaha.</li>
+            <li>Setup QRIS & Kasir Digital.</li>
+            <li>Sesi pelatihan pemilik/karyawan.</li>
+          </ul>
+          <a class="btn btn--outline" href="#" data-wa aria-label="Chat WhatsApp untuk Paket Naik Kelas Web dan Kasir"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp</a>
+        </article>
+      </div>
+
+      <div class="extra">
+        <p class="extra-item"><strong>Layanan satuan:</strong> Daftarkan Profil Bisnis Google saja — <strong>Rp100.000</strong>.</p>
+        <p class="extra-item"><strong>Perawatan opsional:</strong> Rp100.000/bulan — update harga, foto, dan produk ringan, backup (salinan data aman), serta pengecekan berkala. Boleh berhenti kapan saja.</p>
+      </div>
+
+      <p class="note">Harga promo perintis, dapat berubah sewaktu-waktu. Harga belum termasuk domain pribadi (mis. .com ±Rp200 ribu/tahun) — untuk mulai bisa pakai alamat web gratis dulu. Pembayaran: DP 50% di awal, pelunasan setelah serah terima. Revisi minor gratis 2x.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="cara-order" aria-labelledby="order-title">
+    <div class="wrap">
+      <p class="sec-label">Cara Order</p>
+      <h2 class="sec-title" id="order-title">Empat Langkah, Biar Gampang</h2>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-no" aria-hidden="true">1</span>
+          <h3>Chat WhatsApp</h3>
+          <p>Ceritakan usahamu.</p>
+        </li>
+        <li class="step">
+          <span class="step-no" aria-hidden="true">2</span>
+          <h3>Kirim Materi</h3>
+          <p>Pilih paket & kirim materi (foto produk, daftar harga, alamat) — cukup dari HP.</p>
+        </li>
+        <li class="step">
+          <span class="step-no" aria-hidden="true">3</span>
+          <h3>Bayar DP 50%</h3>
+          <p>DP 50%, web dikerjakan 3–7 hari kerja.</p>
+        </li>
+        <li class="step">
+          <span class="step-no" aria-hidden="true">4</span>
+          <h3>Cek & Serah Terima</h3>
+          <p>Cek hasil, revisi minor, pelunasan, serah terima + diajari cara update dasar.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="sec" id="bukti" aria-labelledby="bukti-title">
+    <div class="wrap">
+      <p class="sec-label">Bukti Karya</p>
+      <h2 class="sec-title" id="bukti-title">Yang Mengerjakan</h2>
+      <div class="work">
+        <p><strong>Yang mengerjakan: Abidul Ikhsan (ikhnova)</strong> — pembuat NetVerse ISP Simulator, simulator jaringan interaktif yang bisa kamu coba langsung.</p>
+        <div class="work-actions">
+          <a class="btn btn--outline" href="https://ikhnova.my.id" target="_blank" rel="noopener" aria-label="Lihat Portofolio ikhnova, membuka tab baru">Lihat Portofolio</a>
+          <a class="btn btn--outline" href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener" aria-label="Coba NetVerse, membuka tab baru">Coba NetVerse</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <p class="sec-label">Pertanyaan Umum</p>
+      <h2 class="sec-title" id="faq-title">Yang Sering Ditanya</h2>
+      <div class="faq">
+        <details class="faq-item">
+          <summary>Saya gaptek, bisa?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <p>Bisa. Semua disiapkan, kamu diajari yang penting saja.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Harus punya laptop?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <p>Tidak, cukup HP untuk kirim foto & daftar harga.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Domain itu apa, wajib beli?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <p>Domain itu alamat web khusus usaha kamu, dan belum wajib untuk mulai.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Berapa lama jadi?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <p>3–7 hari kerja, tergantung paket & kelengkapan materi.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Setelah jadi, kalau mau ganti harga/foto bagaimana?<svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <p>Bisa update sendiri setelah diajari, atau pakai layanan perawatan.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing" aria-labelledby="closing-title">
+    <div class="wrap">
+      <p class="sec-label">Ayo Mulai</p>
+      <h2 class="closing-title" id="closing-title">Usaha tetanggamu sudah online duluan. Giliran usahamu sekarang.</h2>
+      <a class="btn btn--primary btn--lg" href="#" data-wa aria-label="Chat WhatsApp sekarang, konsultasi gratis"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg>Chat WhatsApp — Konsultasi Gratis</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap"><p>© 2026 Abidul Ikhsan · ikhnova.my.id · Melayani Pasuruan & sekitarnya</p></div>
+</footer>
+
+<a class="wa-float" href="#" data-wa aria-label="Chat WhatsApp sekarang"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#waIcon"></use></svg></a>
+
+<script>
+const NOMOR_WA = "[NOMOR_WA]";
+const PESAN_WA = "Halo kak, saya mau tanya jasa web untuk usaha saya.";
+if (!NOMOR_WA.startsWith("[")) {
+  const linkWa = "https://wa.me/" + NOMOR_WA + "?text=" + encodeURIComponent(PESAN_WA);
+  document.querySelectorAll("[data-wa]").forEach(el => el.setAttribute("href", linkWa));
+}
+</script>
+</body>
+</html>
