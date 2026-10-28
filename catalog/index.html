@@ -162,12 +162,14 @@ body.nav-open{overflow:hidden}
 .tile svg{width:20px;height:20px;flex:none;color:var(--accent);transition:transform .2s ease}
 .tile:hover svg{transform:translate(2px,-2px)}
 
-.site-footer{margin-top:34px;border-top:1px solid var(--line);padding-block:24px;color:var(--dim);font-size:13px}
-.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.site-footer{margin-top:48px;border-top:1px solid var(--accent-line);padding-block:32px 40px;color:var(--dim);font-size:13px;background:rgba(26,26,46,.4)}
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+.foot-copy{display:grid;gap:4px}
 .foot p{margin:0}
-.foot-links{display:flex;flex-wrap:wrap;gap:16px}
-.foot-links a{color:var(--dim);text-decoration:none;transition:color .2s ease}
-.foot-links a:hover{color:var(--accent)}
+.foot-tagline{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+.foot-links{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+.foot-links a{color:var(--dim);text-decoration:none;transition:color .2s ease,transform .2s ease;font-size:13px}
+.foot-links a:hover{color:var(--text);transform:translateY(-1px)}
 
 @keyframes sweep{0%{transform:translateX(-100%)}55%,100%{transform:translateX(100%)}}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -364,10 +366,14 @@ body.nav-open{overflow:hidden}
 
 <footer class="site-footer">
   <div class="wrap foot">
-    <p>© 2026 Abidul Ikhsan — Ikhnova</p>
+    <div class="foot-copy">
+      <p>© 2026 Abidul Ikhsan — Ikhnova</p>
+      <span class="foot-tagline">Network Simulation & Infrastructure Developer · Pasuruan, ID</span>
+    </div>
     <p class="foot-links">
       <a href="https://ikhnova.my.id">ikhnova.my.id</a>
       <a href="https://netverse.ikhnova.my.id" target="_blank" rel="noopener">netverse.ikhnova.my.id</a>
+      <a href="https://ikhnova.my.id/jasa/" target="_blank" rel="noopener">jasa umkm</a>
       <a href="https://github.com/abidulikhsan-rgb" target="_blank" rel="noopener">github</a>
       <a href="https://www.instagram.com/_.ikhxann.ab" target="_blank" rel="noopener">instagram</a>
     </p>
